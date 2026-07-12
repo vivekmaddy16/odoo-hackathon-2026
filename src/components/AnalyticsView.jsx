@@ -201,7 +201,8 @@ const AnalyticsView = () => {
       {/* KPI Cards Row */}
       <div className="grid-cols-4">
         {/* Fuel Efficiency */}
-        <div className="card card-handdrawn kpi-card" style={{ borderLeft: '4px solid var(--info-color)' }}>
+        <div className="card card-handdrawn kpi-card kpi-card-info">
+          <Fuel size={36} className="kpi-icon-bg" />
           <div className="kpi-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <Fuel size={14} />
             <span>FUEL EFFICIENCY</span>
@@ -213,7 +214,8 @@ const AnalyticsView = () => {
         </div>
 
         {/* Fleet Utilization */}
-        <div className="card card-handdrawn kpi-card" style={{ borderLeft: '4px solid var(--success-color)' }}>
+        <div className="card card-handdrawn kpi-card kpi-card-success">
+          <BarChart2 size={36} className="kpi-icon-bg" />
           <div className="kpi-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <BarChart2 size={14} />
             <span>FLEET UTILIZATION</span>
@@ -225,7 +227,8 @@ const AnalyticsView = () => {
         </div>
 
         {/* Operational Cost */}
-        <div className="card card-handdrawn kpi-card" style={{ borderLeft: '4px solid var(--warning-color)' }}>
+        <div className="card card-handdrawn kpi-card kpi-card-warning">
+          <DollarSign size={36} className="kpi-icon-bg" />
           <div className="kpi-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <DollarSign size={14} />
             <span>OPERATIONAL COST</span>
@@ -237,7 +240,8 @@ const AnalyticsView = () => {
         </div>
 
         {/* Vehicle ROI */}
-        <div className="card card-handdrawn kpi-card" style={{ borderLeft: '4px solid var(--accent-color)' }}>
+        <div className="card card-handdrawn kpi-card kpi-card-accent">
+          <TrendingUp size={36} className="kpi-icon-bg" />
           <div className="kpi-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <TrendingUp size={14} />
             <span>VEHICLE ROI</span>

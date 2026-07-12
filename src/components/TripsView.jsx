@@ -329,13 +329,13 @@ const TripsView = ({ searchQuery }) => {
                   </div>
 
                   {/* Actions depending on Status */}
-                  <div style={{ display: 'flex', justifyItems: 'flex-end', gap: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                     {trip.status === 'Draft' && (
                       <>
                         <button 
                           className="btn btn-primary"
                           onClick={() => handleDispatchTrip(trip.id)}
-                          style={{ padding: '6px 12px', fontSize: '0.85rem', flex: 1 }}
+                          style={{ padding: '6px 12px', fontSize: '0.85rem', flex: '1 1 auto', minWidth: '100px' }}
                         >
                           <Play size={14} />
                           <span>Dispatch</span>
@@ -343,7 +343,7 @@ const TripsView = ({ searchQuery }) => {
                         <button 
                           className="btn btn-secondary"
                           onClick={() => handleCancelTrip(trip.id)}
-                          style={{ padding: '6px 12px', fontSize: '0.85rem', border: '1.5px solid var(--error-color)', color: 'var(--error-color)' }}
+                          style={{ padding: '6px 12px', fontSize: '0.85rem', border: '1.5px solid var(--error-color)', color: 'var(--error-color)', flexShrink: 0 }}
                         >
                           Cancel
                         </button>
@@ -355,7 +355,7 @@ const TripsView = ({ searchQuery }) => {
                         <button 
                           className="btn btn-primary"
                           onClick={() => handleOpenCompleteModal(trip)}
-                          style={{ padding: '6px 12px', fontSize: '0.85rem', flex: 1, backgroundColor: 'var(--success-color)', borderColor: 'var(--success-color)' }}
+                          style={{ padding: '6px 12px', fontSize: '0.85rem', flex: '1 1 auto', minWidth: '120px', backgroundColor: 'var(--success-color)', borderColor: 'var(--success-color)' }}
                         >
                           <Check size={14} />
                           <span>Complete Trip</span>
@@ -363,7 +363,7 @@ const TripsView = ({ searchQuery }) => {
                         <button 
                           className="btn btn-secondary"
                           onClick={() => handleCancelTrip(trip.id)}
-                          style={{ padding: '6px 12px', fontSize: '0.85rem' }}
+                          style={{ padding: '6px 12px', fontSize: '0.85rem', flexShrink: 0 }}
                         >
                           Cancel
                         </button>
@@ -371,15 +371,15 @@ const TripsView = ({ searchQuery }) => {
                     )}
 
                     {trip.status === 'Completed' && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--success-color)', fontSize: '0.85rem', fontWeight: 'bold' }}>
-                        <CheckCircle2 size={14} />
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--success-color)', fontSize: '0.85rem', fontWeight: 'bold', flexWrap: 'wrap', wordBreak: 'break-word' }}>
+                        <CheckCircle2 size={14} style={{ flexShrink: 0 }} />
                         <span>Completed (Odo: {trip.odometerEnd} km, Fuel: {trip.fuelConsumed}L)</span>
                       </div>
                     )}
 
                     {trip.status === 'Cancelled' && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--error-color)', fontSize: '0.85rem', fontWeight: 'bold' }}>
-                        <XCircle size={14} />
+                        <XCircle size={14} style={{ flexShrink: 0 }} />
                         <span>Cancelled</span>
                       </div>
                     )}
