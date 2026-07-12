@@ -81,8 +81,55 @@ const MaintenanceView = ({ searchQuery }) => {
     }).format(amount);
   };
 
+  // Calculate KPI metrics
+  const activeLogs = maintenanceLogs.filter(log => log.status === 'Active');
+  const completedLogs = maintenanceLogs.filter(log => log.status === 'Completed');
+  const activeCount = activeLogs.length;
+  const completedCount = completedLogs.length;
+  const totalSpend = maintenanceLogs.reduce((sum, log) => sum + log.cost, 0);
+  const pendingCost = activeLogs.reduce((sum, log) => sum + log.cost, 0);
+
   return (
     <div className="view-container">
+      {/* KPI Stats Grid */}
+      <div className="grid-cols-4" style={{ marginBottom: '24px' }}>
+        <div className="card kpi-card kpi-card-warning">
+          <div className="kpi-label">Active Service</div>
+          <div className="kpi-value">{activeCount}</div>
+          <div className="kpi-trend" style={{ color: 'var(--warning-color)' }}>
+            <span>Vehicles in shop</span>
+          </div>
+          <Wrench className="kpi-icon-bg" size={48} />
+        </div>
+
+        <div className="card kpi-card kpi-card-accent">
+          <div className="kpi-label">Total Spend</div>
+          <div className="kpi-value">{formatCurrency(totalSpend)}</div>
+          <div className="kpi-trend" style={{ color: 'var(--accent-color)' }}>
+            <span>All-time maintenance</span>
+          </div>
+          <CheckCircle className="kpi-icon-bg" size={48} />
+        </div>
+
+        <div className="card kpi-card kpi-card-info">
+          <div className="kpi-label">Pending Cost</div>
+          <div className="kpi-value">{formatCurrency(pendingCost)}</div>
+          <div className="kpi-trend" style={{ color: 'var(--info-color)' }}>
+            <span>Estimated active cost</span>
+          </div>
+          <AlertTriangle className="kpi-icon-bg" size={48} />
+        </div>
+
+        <div className="card kpi-card kpi-card-success">
+          <div className="kpi-label">Completed Tasks</div>
+          <div className="kpi-value">{completedCount}</div>
+          <div className="kpi-trend" style={{ color: 'var(--success-color)' }}>
+            <span>Successfully closed</span>
+          </div>
+          <Check className="kpi-icon-bg" size={48} />
+        </div>
+      </div>
+
       <div className="grid-cols-2">
         {/* Left: Log service record form */}
         <div className="card card-handdrawn" style={{ height: 'fit-content' }}>
