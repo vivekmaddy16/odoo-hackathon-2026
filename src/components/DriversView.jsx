@@ -160,7 +160,6 @@ const DriversView = ({ searchQuery }) => {
                        <select
                          className={`status-select-pill badge ${getStatusBadge(driver.status, driver.expiryDate)}`}
                          value={driver.status}
-                         disabled={driver.status === 'On Trip'}
                          onChange={async (e) => {
                            try {
                              await updateDriverStatus(driver.licenseNo, e.target.value);
@@ -183,10 +182,9 @@ const DriversView = ({ searchQuery }) => {
                     <td>
                       <button 
                         onClick={() => handleDeleteDriver(driver.licenseNo)}
-                        disabled={driver.status === 'On Trip'}
                         className="btn btn-danger"
                         style={{ padding: '6px 10px', fontSize: '0.8rem', boxShadow: 'none' }}
-                        title={driver.status === 'On Trip' ? 'Cannot delete driver on a trip' : 'Delete Driver'}
+                        title="Delete Driver"
                       >
                         <Trash2 size={14} />
                       </button>

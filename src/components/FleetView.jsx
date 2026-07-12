@@ -169,7 +169,6 @@ const FleetView = ({ searchQuery }) => {
                     <select
                       className={`status-select-pill badge ${getStatusBadge(vehicle.status)}`}
                       value={vehicle.status}
-                      disabled={vehicle.status === 'On Trip'}
                       onChange={async (e) => {
                         try {
                           await updateVehicleStatus(vehicle.id, e.target.value);
@@ -189,10 +188,9 @@ const FleetView = ({ searchQuery }) => {
                   <td>
                     <button 
                       onClick={() => handleDeleteVehicle(vehicle.id)}
-                      disabled={vehicle.status === 'On Trip'}
                       className="btn btn-danger"
                       style={{ padding: '6px 10px', fontSize: '0.8rem', boxShadow: 'none' }}
-                      title={vehicle.status === 'On Trip' ? 'Cannot delete vehicle on a trip' : 'Delete Vehicle'}
+                      title="Delete Vehicle"
                     >
                       <Trash2 size={14} />
                     </button>
