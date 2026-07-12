@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { AppContext } from '../context/AppContext';
-import { AlertCircle, Lock, LogIn, Shield, Truck, Navigation, BarChart3, Eye, EyeOff, UserPlus, Zap } from 'lucide-react';
+import { AlertCircle, Lock, LogIn, Shield, Truck, Navigation, BarChart3, Eye, EyeOff, UserPlus, Zap, Mail, User, Key } from 'lucide-react';
 
 const DEMO_ACCOUNTS = [
   { role: 'Fleet Manager',     email: 'fleet@transitops.in',      password: 'Fleet@123',    icon: Truck,      color: '#3b82f6', label: 'FL' },
@@ -101,56 +101,89 @@ const LoginScreen = () => {
 
   return (
     <div className="login-screen">
+      {/* Background glowing effects */}
+      <div className="login-bg-glow" />
+      <div className="login-bg-glow-right" />
+
       {/* Left panel: Branding and access explanation */}
       <div className="login-left">
         <div className="login-logo-container">
-          <h1 className="login-logo">TransitOps</h1>
-          <p className="login-tagline">Smart Transport Operations Platform</p>
+          <div className="login-header-group">
+            <h1 className="login-logo">
+              <Truck size={36} style={{ color: 'var(--accent-color)' }} />
+              TransitOps
+            </h1>
+            <p className="login-tagline">Smart Transport Operations Platform</p>
+          </div>
 
-          <div className="role-helper-list" style={{ marginTop: '32px' }}>
-            <h4 style={{ marginBottom: '16px', fontSize: '1rem' }}>Role-Based Access Control</h4>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
+          <div className="role-helper-list">
+            <h4>Role-Based Access Control</h4>
+            <p className="role-helper-desc">
               TransitOps enforces secure access controls. To register an account for a specific operational role, you must enter the authorized Security Access Key.
             </p>
-            <ul style={{ listStyle: 'none', padding: 0 }}>
-              <li style={{ border: '1px dashed var(--border-color)', padding: '10px 14px', borderRadius: '8px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Truck size={16} style={{ color: 'var(--info-color)' }} />
-                <div>
-                  <div style={{ fontWeight: 'bold', fontSize: '0.85rem' }}>Fleet Manager</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Manages fleet registry, maintenance, and system configurations.</div>
-                </div>
-              </li>
-              <li style={{ border: '1px dashed var(--border-color)', padding: '10px 14px', borderRadius: '8px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Navigation size={16} style={{ color: 'var(--success-color)' }} />
-                <div>
-                  <div style={{ fontWeight: 'bold', fontSize: '0.85rem' }}>Dispatcher</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Dispatches active shipments, plans routes, and updates trip status.</div>
-                </div>
-              </li>
-              <li style={{ border: '1px dashed var(--border-color)', padding: '10px 14px', borderRadius: '8px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Shield size={16} style={{ color: 'var(--warning-color)' }} />
-                <div>
-                  <div style={{ fontWeight: 'bold', fontSize: '0.85rem' }}>Safety Officer</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Oversees driver profiles, safety logs, and license validation.</div>
-                </div>
-              </li>
-              <li style={{ border: '1px dashed var(--border-color)', padding: '10px 14px', borderRadius: '8px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <BarChart3 size={16} style={{ color: 'var(--accent-color)' }} />
-                <div>
-                  <div style={{ fontWeight: 'bold', fontSize: '0.85rem' }}>Financial Analyst</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Tracks fuel logs, direct transaction ledgers, and operational costs.</div>
-                </div>
-              </li>
-            </ul>
+            <div className="role-helper-cards">
+              {DEMO_ACCOUNTS.map((acc) => {
+                const Icon = acc.icon;
+                return (
+                  <div 
+                    key={acc.role}
+                    className="role-card-item"
+                    onClick={() => handleDemoLogin(acc)}
+                    style={{
+                      '--card-border-hover': `${acc.color}55`,
+                      '--card-accent-color': acc.color
+                    }}
+                  >
+                    <div 
+                      className="role-card-icon-wrapper"
+                      style={{
+                        color: acc.color,
+                        background: `${acc.color}11`,
+                        borderColor: `${acc.color}22`
+                      }}
+                    >
+                      <Icon size={18} />
+                    </div>
+                    <div>
+                      <div className="role-card-title">{acc.role}</div>
+                      <div className="role-card-desc">
+                        {acc.role === 'Fleet Manager' && 'Manages fleet registry, maintenance, and system configurations.'}
+                        {acc.role === 'Dispatcher' && 'Dispatches active shipments, plans routes, and updates trip status.'}
+                        {acc.role === 'Safety Officer' && 'Oversees driver profiles, safety logs, and license validation.'}
+                        {acc.role === 'Financial Analyst' && 'Tracks fuel logs, direct transaction ledgers, and operational costs.'}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Right panel: Auth form */}
       <div className="login-right">
-        <div style={{ width: '100%', maxWidth: '420px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div style={{ width: '100%', maxWidth: '440px', display: 'flex', flexDirection: 'column' }}>
           
           <div className="login-form-card">
+            {/* Segmented Control / Tab Switcher */}
+            <div className="login-tab-container">
+              <button 
+                type="button" 
+                className={`login-tab-btn ${authMode === 'signin' ? 'active' : ''}`}
+                onClick={() => { setAuthMode('signin'); setError(''); }}
+              >
+                Sign In
+              </button>
+              <button 
+                type="button" 
+                className={`login-tab-btn ${authMode === 'signup' ? 'active' : ''}`}
+                onClick={() => { setAuthMode('signup'); setError(''); }}
+              >
+                Register
+              </button>
+            </div>
+
             {authMode === 'signin' ? (
               <>
                 <h2 className="login-form-title">Sign in to your account</h2>
@@ -164,7 +197,7 @@ const LoginScreen = () => {
                 )}
 
                 {lockedTime > 0 && (
-                  <div className="alert-box alert-warning" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div className="alert-box alert-warning" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
                     <Lock size={14} />
                     <span>Locked — try again in {lockedTime}s</span>
                   </div>
@@ -173,20 +206,29 @@ const LoginScreen = () => {
                 <form onSubmit={handleSignIn}>
                   <div className="form-group">
                     <label className="form-label">Email Address</label>
-                    <input
-                      type="email"
-                      className="form-input"
-                      placeholder="e.g. fleet@transitops.in"
-                      value={email}
-                      onChange={(e) => { setEmail(e.target.value); setError(''); }}
-                      disabled={lockedTime > 0}
-                      autoComplete="email"
-                    />
+                    <div className="login-input-wrapper">
+                      <div className="login-input-icon">
+                        <Mail size={16} />
+                      </div>
+                      <input
+                        type="email"
+                        className="form-input"
+                        placeholder="e.g. fleet@transitops.in"
+                        value={email}
+                        onChange={(e) => { setEmail(e.target.value); setError(''); }}
+                        disabled={lockedTime > 0}
+                        autoComplete="email"
+                        required
+                      />
+                    </div>
                   </div>
 
                   <div className="form-group">
                     <label className="form-label">Password</label>
-                    <div style={{ position: 'relative' }}>
+                    <div className="login-input-wrapper">
+                      <div className="login-input-icon">
+                        <Lock size={16} />
+                      </div>
                       <input
                         type={showPassword ? 'text' : 'password'}
                         className="form-input"
@@ -196,13 +238,14 @@ const LoginScreen = () => {
                         disabled={lockedTime > 0}
                         autoComplete="current-password"
                         style={{ paddingRight: '40px' }}
+                        required
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         style={{
                           position: 'absolute',
-                          right: '10px',
+                          right: '12px',
                           top: '50%',
                           transform: 'translateY(-50%)',
                           background: 'none',
@@ -221,8 +264,7 @@ const LoginScreen = () => {
 
                   <button
                     type="submit"
-                    className="btn btn-primary"
-                    style={{ width: '100%', padding: '11px', fontSize: '1rem', marginTop: '16px' }}
+                    className="login-btn-submit"
                     disabled={lockedTime > 0}
                   >
                     <LogIn size={16} />
@@ -230,53 +272,51 @@ const LoginScreen = () => {
                   </button>
                 </form>
 
-                <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                  Don't have an account?{' '}
-                  <span
-                    onClick={() => { setAuthMode('signup'); setError(''); }}
-                    style={{ color: 'var(--accent-color)', cursor: 'pointer', fontWeight: 'bold' }}
-                  >
-                    Create one here
-                  </span>
+                {/* ── Demo quick-access ── */}
+                <div className="login-divider-container">
+                  <div className="login-divider-line"></div>
+                  <span className="login-divider-text">Try Demo — No Account Needed</span>
+                  <div className="login-divider-line"></div>
                 </div>
 
-                {/* ── Demo quick-access ── */}
-                <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '2px dashed var(--border-color)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                    <Zap size={14} style={{ color: 'var(--accent-color)' }} />
-                    <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--text-secondary)', fontFamily: 'var(--font-hand)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      Try Demo — No Account Needed
-                    </span>
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                    {DEMO_ACCOUNTS.map((acc) => {
-                      const Icon = acc.icon;
-                      const isLoading = demoLoading === acc.role;
-                      return (
-                        <button
-                          key={acc.role}
-                          onClick={() => handleDemoLogin(acc)}
-                          disabled={!!demoLoading}
-                          className="btn btn-secondary"
-                          style={{
-                            padding: '8px 10px',
-                            fontSize: '0.8rem',
-                            gap: '7px',
-                            justifyContent: 'flex-start',
-                            borderColor: `${acc.color}55`,
-                            color: acc.color,
-                            opacity: demoLoading && !isLoading ? 0.4 : 1,
-                            cursor: demoLoading ? 'wait' : 'pointer',
-                          }}
-                        >
-                          {isLoading
-                            ? <span style={{ width: 14, height: 14, border: `2px solid ${acc.color}44`, borderTop: `2px solid ${acc.color}`, borderRadius: '50%', display: 'inline-block', animation: 'spin 0.7s linear infinite', flexShrink: 0 }} />
-                            : <Icon size={14} style={{ flexShrink: 0 }} />}
-                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{acc.role}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
+                <div className="login-demo-grid">
+                  {DEMO_ACCOUNTS.map((acc) => {
+                    const Icon = acc.icon;
+                    const isLoading = demoLoading === acc.role;
+                    return (
+                      <button
+                        key={acc.role}
+                        type="button"
+                        onClick={() => handleDemoLogin(acc)}
+                        disabled={!!demoLoading}
+                        className="login-demo-btn"
+                        style={{
+                          '--btn-hover-bg': `${acc.color}11`,
+                          '--btn-hover-border': `${acc.color}88`,
+                          '--btn-hover-color': acc.color,
+                          '--btn-hover-shadow': `${acc.color}15`,
+                          opacity: demoLoading && !isLoading ? 0.5 : 1,
+                          cursor: demoLoading ? 'wait' : 'pointer',
+                        }}
+                      >
+                        {isLoading ? (
+                          <span style={{ 
+                            width: 14, 
+                            height: 14, 
+                            border: `2px solid ${acc.color}44`, 
+                            borderTop: `2px solid ${acc.color}`, 
+                            borderRadius: '50%', 
+                            display: 'inline-block', 
+                            animation: 'spin 0.7s linear infinite', 
+                            flexShrink: 0 
+                          }} />
+                        ) : (
+                          <Icon size={14} style={{ flexShrink: 0, color: acc.color }} />
+                        )}
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{acc.role}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </>
             ) : (
@@ -294,123 +334,145 @@ const LoginScreen = () => {
                 <form onSubmit={handleSignUp}>
                   <div className="form-group">
                     <label className="form-label">Full Name</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="e.g. John Doe"
-                      value={name}
-                      onChange={(e) => { setName(e.target.value); setError(''); }}
-                      required
-                    />
+                    <div className="login-input-wrapper">
+                      <div className="login-input-icon">
+                        <User size={16} />
+                      </div>
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="e.g. John Doe"
+                        value={name}
+                        onChange={(e) => { setName(e.target.value); setError(''); }}
+                        required
+                      />
+                    </div>
                   </div>
 
                   <div className="form-group">
                     <label className="form-label">Email Address</label>
-                    <input
-                      type="email"
-                      className="form-input"
-                      placeholder="e.g. john@transitops.in"
-                      value={email}
-                      onChange={(e) => { setEmail(e.target.value); setError(''); }}
-                      required
-                    />
+                    <div className="login-input-wrapper">
+                      <div className="login-input-icon">
+                        <Mail size={16} />
+                      </div>
+                      <input
+                        type="email"
+                        className="form-input"
+                        placeholder="e.g. john@transitops.in"
+                        value={email}
+                        onChange={(e) => { setEmail(e.target.value); setError(''); }}
+                        required
+                      />
+                    </div>
                   </div>
 
                   <div className="form-group">
                     <label className="form-label">Password</label>
-                    <input
-                      type="password"
-                      className="form-input"
-                      placeholder="Min. 6 characters"
-                      value={password}
-                      onChange={(e) => { setPassword(e.target.value); setError(''); }}
-                      required
-                    />
+                    <div className="login-input-wrapper">
+                      <div className="login-input-icon">
+                        <Lock size={16} />
+                      </div>
+                      <input
+                        type="password"
+                        className="form-input"
+                        placeholder="Min. 6 characters"
+                        value={password}
+                        onChange={(e) => { setPassword(e.target.value); setError(''); }}
+                        required
+                      />
+                    </div>
                   </div>
 
                   <div className="form-group">
                     <label className="form-label">Role</label>
-                    <select
-                      className="form-select"
-                      value={role}
-                      onChange={(e) => { setRole(e.target.value); setError(''); }}
-                    >
-                      <option value="Fleet Manager">Fleet Manager</option>
-                      <option value="Dispatcher">Dispatcher</option>
-                      <option value="Safety Officer">Safety Officer</option>
-                      <option value="Financial Analyst">Financial Analyst</option>
-                    </select>
+                    <div className="login-input-wrapper">
+                      <div className="login-input-icon">
+                        <Shield size={16} />
+                      </div>
+                      <select
+                        className="form-select"
+                        value={role}
+                        onChange={(e) => { setRole(e.target.value); setError(''); }}
+                      >
+                        <option value="Fleet Manager">Fleet Manager</option>
+                        <option value="Dispatcher">Dispatcher</option>
+                        <option value="Safety Officer">Safety Officer</option>
+                        <option value="Financial Analyst">Financial Analyst</option>
+                      </select>
+                    </div>
                   </div>
 
                   <div className="form-group">
                     <label className="form-label">Role Authorization Key</label>
-                    <input
-                      type="password"
-                      className="form-input"
-                      placeholder="Required for role authorization"
-                      value={roleKey}
-                      onChange={(e) => { setRoleKey(e.target.value); setError(''); }}
-                      required
-                    />
+                    <div className="login-input-wrapper">
+                      <div className="login-input-icon">
+                        <Key size={16} />
+                      </div>
+                      <input
+                        type="password"
+                        className="form-input"
+                        placeholder="Required for role authorization"
+                        value={roleKey}
+                        onChange={(e) => { setRoleKey(e.target.value); setError(''); }}
+                        required
+                      />
+                    </div>
                   </div>
 
                   <button
                     type="submit"
-                    className="btn btn-primary"
-                    style={{ width: '100%', padding: '11px', fontSize: '1rem', marginTop: '16px' }}
+                    className="login-btn-submit"
                   >
                     <UserPlus size={16} />
                     <span>Create Account</span>
                   </button>
                 </form>
 
-                <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                  Already have an account?{' '}
-                  <span
-                    onClick={() => { setAuthMode('signin'); setError(''); }}
-                    style={{ color: 'var(--accent-color)', cursor: 'pointer', fontWeight: 'bold' }}
-                  >
-                    Sign In instead
-                  </span>
+                {/* ── Demo quick-access ── */}
+                <div className="login-divider-container">
+                  <div className="login-divider-line"></div>
+                  <span className="login-divider-text">Try Demo — No Account Needed</span>
+                  <div className="login-divider-line"></div>
                 </div>
 
-                {/* ── Demo quick-access ── */}
-                <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '2px dashed var(--border-color)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                    <Zap size={14} style={{ color: 'var(--accent-color)' }} />
-                    <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--text-secondary)', fontFamily: 'var(--font-hand)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      Try Demo — No Account Needed
-                    </span>
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                    {DEMO_ACCOUNTS.map((acc) => {
-                      const Icon = acc.icon;
-                      const isLoading = demoLoading === acc.role;
-                      return (
-                        <button
-                          key={acc.role}
-                          onClick={() => handleDemoLogin(acc)}
-                          disabled={!!demoLoading}
-                          className="btn btn-secondary"
-                          style={{
-                            padding: '8px 10px',
-                            fontSize: '0.8rem',
-                            gap: '7px',
-                            justifyContent: 'flex-start',
-                            borderColor: `${acc.color}55`,
-                            color: acc.color,
-                            opacity: demoLoading && !isLoading ? 0.4 : 1,
-                            cursor: demoLoading ? 'wait' : 'pointer',
-                          }}
-                        >
-                          {isLoading
-                            ? <span style={{ width: 14, height: 14, border: `2px solid ${acc.color}44`, borderTop: `2px solid ${acc.color}`, borderRadius: '50%', display: 'inline-block', animation: 'spin 0.7s linear infinite', flexShrink: 0 }} />
-                            : <Icon size={14} style={{ flexShrink: 0 }} />}
-                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{acc.role}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
+                <div className="login-demo-grid">
+                  {DEMO_ACCOUNTS.map((acc) => {
+                    const Icon = acc.icon;
+                    const isLoading = demoLoading === acc.role;
+                    return (
+                      <button
+                        key={acc.role}
+                        type="button"
+                        onClick={() => handleDemoLogin(acc)}
+                        disabled={!!demoLoading}
+                        className="login-demo-btn"
+                        style={{
+                          '--btn-hover-bg': `${acc.color}11`,
+                          '--btn-hover-border': `${acc.color}88`,
+                          '--btn-hover-color': acc.color,
+                          '--btn-hover-shadow': `${acc.color}15`,
+                          opacity: demoLoading && !isLoading ? 0.5 : 1,
+                          cursor: demoLoading ? 'wait' : 'pointer',
+                        }}
+                      >
+                        {isLoading ? (
+                          <span style={{ 
+                            width: 14, 
+                            height: 14, 
+                            border: `2px solid ${acc.color}44`, 
+                            borderTop: `2px solid ${acc.color}`, 
+                            borderRadius: '50%', 
+                            display: 'inline-block', 
+                            animation: 'spin 0.7s linear infinite', 
+                            flexShrink: 0 
+                          }} />
+                        ) : (
+                          <Icon size={14} style={{ flexShrink: 0, color: acc.color }} />
+                        )}
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{acc.role}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </>
             )}
