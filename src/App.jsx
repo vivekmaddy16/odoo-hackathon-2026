@@ -23,7 +23,7 @@ const AccessDenied = () => {
         Your current role profile (<strong>{user?.role}</strong>) does not have authorization to view this module. 
       </p>
       <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-        Use the Quick Switch Role selector in the top bar to simulate another profile for testing.
+        Please contact your administrator to request access to this module.
       </p>
     </div>
   );
