@@ -160,7 +160,7 @@ const DriversView = ({ searchQuery }) => {
                        <select
                          className={`status-select-pill badge ${getStatusBadge(driver.status, driver.expiryDate)}`}
                          value={driver.status}
-                         disabled={driver.status === 'On Trip' || expired}
+                         disabled={driver.status === 'On Trip'}
                          onChange={async (e) => {
                            try {
                              await updateDriverStatus(driver.licenseNo, e.target.value);
