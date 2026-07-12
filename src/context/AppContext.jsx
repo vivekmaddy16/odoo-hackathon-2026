@@ -2,7 +2,11 @@ import React, { createContext, useState, useEffect } from 'react';
 
 export const AppContext = createContext();
 
-const API_BASE_URL = 'http://localhost:5000/api';
+let base = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+if (base && !base.endsWith('/api') && !base.endsWith('/api/')) {
+  base = base.replace(/\/$/, '') + '/api';
+}
+const API_BASE_URL = base;
 
 export const AppProvider = ({ children }) => {
   const [vehicles, setVehicles] = useState([]);
