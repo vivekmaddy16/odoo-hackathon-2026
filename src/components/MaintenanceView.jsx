@@ -247,11 +247,22 @@ const MaintenanceView = ({ searchQuery }) => {
                     <td className="td-mono">{formatCurrency(log.cost)}</td>
                     <td className="td-mono">{log.date}</td>
                     <td>
-                      <span className={`badge ${
-                        log.status === 'Active' ? 'badge-in-shop' : 'badge-available'
-                      }`}>
-                        {log.status === 'Active' ? 'In Shop' : 'Completed'}
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
+                          flexShrink: 0,
+                          backgroundColor: log.status === 'Active' ? 'var(--warning-color)' : 'var(--success-color)'
+                        }} />
+                        <span style={{
+                          fontSize: '0.85rem',
+                          fontWeight: '600',
+                          color: log.status === 'Active' ? 'var(--warning-color)' : 'var(--success-color)'
+                        }}>
+                          {log.status === 'Active' ? 'In Shop' : 'Completed'}
+                        </span>
+                      </div>
                     </td>
                     <td>
                       {log.status === 'Active' ? (
