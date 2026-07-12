@@ -16,14 +16,16 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(400).json({ error: 'All fields are required.' });
     }
 
+    // Role keys are loaded from server environment variables only.
+    // They are never exposed in the source code or to the client.
     const ROLE_KEYS = {
-      'Fleet Manager': 'FLEET_SECURE_2026',
-      'Dispatcher': 'DISPATCH_SECURE_2026',
-      'Safety Officer': 'SAFETY_SECURE_2026',
-      'Financial Analyst': 'FINANCE_SECURE_2026'
+      'Fleet Manager':      process.env.ROLE_KEY_FLEET_MANAGER,
+      'Dispatcher':         process.env.ROLE_KEY_DISPATCHER,
+      'Safety Officer':     process.env.ROLE_KEY_SAFETY_OFFICER,
+      'Financial Analyst':  process.env.ROLE_KEY_FINANCIAL_ANALYST,
     };
 
-    if (roleKey !== ROLE_KEYS[role]) {
+    if (!ROLE_KEYS[role] || roleKey !== ROLE_KEYS[role]) {
       return res.status(400).json({ error: 'Invalid Role Authorization Key. Please contact admin.' });
     }
 
