@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import { Truck, Navigation, AlertTriangle, Users, TrendingUp, CheckCircle, Ban, Clock, Percent } from 'lucide-react';
-import LiveRouteMap from './LiveRouteMap';
 
 const DashboardView = ({ searchQuery }) => {
   const { vehicles, drivers, trips, updateTripStatus } = useContext(AppContext);
@@ -196,10 +195,7 @@ const DashboardView = ({ searchQuery }) => {
         </div>
       </div>
 
-      {/* Real-time Tracker Simulation */}
-      <div style={{ marginBottom: '24px' }}>
-        <LiveRouteMap trips={trips} />
-      </div>
+
 
       {/* Main Content Split */}
       <div className="grid-cols-2">
