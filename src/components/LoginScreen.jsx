@@ -6,11 +6,75 @@ import {
 } from 'lucide-react';
 
 const DEMO_ACCOUNTS = [
-  { role: 'Fleet Manager',     email: 'fleet@transitops.in',      password: 'Fleet@123',    icon: Truck,    color: '#3b82f6' },
+  { role: 'Fleet Manager',     email: 'fleet@transitops.in',      password: 'Fleet@123',    icon: Truck,     color: '#3b82f6' },
   { role: 'Dispatcher',        email: 'dispatcher@transitops.in', password: 'Dispatch@123', icon: Navigation, color: '#10b981' },
-  { role: 'Safety Officer',    email: 'safety@transitops.in',     password: 'Safety@123',   icon: Shield,   color: '#f59e0b' },
-  { role: 'Financial Analyst', email: 'finance@transitops.in',    password: 'Finance@123',  icon: BarChart3, color: '#6366f1' },
+  { role: 'Safety Officer',    email: 'safety@transitops.in',     password: 'Safety@123',   icon: Shield,    color: '#f59e0b' },
+  { role: 'Financial Analyst', email: 'finance@transitops.in',    password: 'Finance@123',  icon: BarChart3,  color: '#6366f1' },
 ];
+
+/* ── Reusable Demo Panel ── */
+const DemoPanel = ({ demoLoading, handleDemoLogin }) => (
+  <div style={{ marginTop: 24 }}>
+    {/* Divider */}
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+      <div style={{ flex: 1, height: 1, background: 'var(--border-dim)' }} />
+      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.8px', whiteSpace: 'nowrap', fontFamily: 'var(--font-body)' }}>
+        or try a demo
+      </span>
+      <div style={{ flex: 1, height: 1, background: 'var(--border-dim)' }} />
+    </div>
+
+    {/* Header */}
+    <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
+      <Zap size={14} style={{ color: '#818cf8' }} />
+      <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#818cf8', letterSpacing: '0.5px', fontFamily: 'var(--font-ui)' }}>
+        No Registration Needed
+      </span>
+    </div>
+
+    {/* 2×2 grid of role buttons */}
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 9 }}>
+      {DEMO_ACCOUNTS.map((acc) => {
+        const Icon = acc.icon;
+        const isThisLoading = demoLoading === acc.role;
+        return (
+          <button
+            key={acc.role}
+            onClick={() => handleDemoLogin(acc)}
+            disabled={!!demoLoading}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '9px 12px',
+              borderRadius: 9,
+              border: `1px solid ${acc.color}33`,
+              background: `${acc.color}12`,
+              color: acc.color,
+              cursor: demoLoading ? 'wait' : 'pointer',
+              fontFamily: 'var(--font-ui)',
+              fontSize: '0.82rem',
+              fontWeight: 600,
+              transition: 'all 0.18s ease',
+              opacity: demoLoading && !isThisLoading ? 0.4 : 1,
+              textAlign: 'left',
+              width: '100%',
+            }}
+            onMouseEnter={(e) => { if (!demoLoading) { e.currentTarget.style.background = `${acc.color}24`; e.currentTarget.style.borderColor = `${acc.color}66`; } }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = `${acc.color}12`; e.currentTarget.style.borderColor = `${acc.color}33`; }}
+          >
+            {isThisLoading ? (
+              <span style={{ width: 14, height: 14, border: `2px solid ${acc.color}44`, borderTop: `2px solid ${acc.color}`, borderRadius: '50%', animation: 'spin 0.7s linear infinite', flexShrink: 0, display: 'inline-block' }} />
+            ) : (
+              <Icon size={14} style={{ flexShrink: 0 }} />
+            )}
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{acc.role}</span>
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
 
 const ROLES = [
   {
@@ -139,67 +203,6 @@ const LoginScreen = () => {
           <div>
             <div className="login-logo-name">TransitOps</div>
             <div className="login-logo-tagline">Fleet Operations Platform</div>
-          </div>
-        </div>
-
-        {/* Demo quick-access */}
-        <div
-          style={{
-            position: 'relative',
-            zIndex: 1,
-            width: '100%',
-            maxWidth: 440,
-            marginBottom: 32,
-            background: 'rgba(99,102,241,0.07)',
-            border: '1px solid rgba(99,102,241,0.22)',
-            borderRadius: 16,
-            padding: '18px 20px',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-            <Zap size={15} style={{ color: '#818cf8' }} />
-            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#818cf8', textTransform: 'uppercase', letterSpacing: '0.8px', fontFamily: 'var(--font-ui)' }}>
-              Try Demo — No Registration Needed
-            </span>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            {DEMO_ACCOUNTS.map((acc) => {
-              const Icon = acc.icon;
-              const isThisLoading = demoLoading === acc.role;
-              return (
-                <button
-                  key={acc.role}
-                  onClick={() => handleDemoLogin(acc)}
-                  disabled={!!demoLoading}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 9,
-                    padding: '9px 12px',
-                    borderRadius: 10,
-                    border: `1px solid ${acc.color}33`,
-                    background: `${acc.color}14`,
-                    color: acc.color,
-                    cursor: demoLoading ? 'wait' : 'pointer',
-                    fontFamily: 'var(--font-ui)',
-                    fontSize: '0.82rem',
-                    fontWeight: 600,
-                    transition: 'all 0.18s ease',
-                    opacity: demoLoading && !isThisLoading ? 0.45 : 1,
-                    textAlign: 'left',
-                  }}
-                  onMouseEnter={(e) => { if (!demoLoading) e.currentTarget.style.background = `${acc.color}26`; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = `${acc.color}14`; }}
-                >
-                  {isThisLoading ? (
-                    <span style={{ width: 16, height: 16, border: `2px solid ${acc.color}44`, borderTop: `2px solid ${acc.color}`, borderRadius: '50%', animation: 'spin 0.7s linear infinite', flexShrink: 0, display: 'inline-block' }} />
-                  ) : (
-                    <Icon size={15} style={{ flexShrink: 0 }} />
-                  )}
-                  <span>{acc.role}</span>
-                </button>
-              );
-            })}
           </div>
         </div>
 
@@ -340,6 +343,9 @@ const LoginScreen = () => {
                   Create one here
                 </button>
               </p>
+
+              {/* Demo panel */}
+              <DemoPanel demoLoading={demoLoading} handleDemoLogin={handleDemoLogin} />
             </>
           ) : (
             <>
@@ -462,6 +468,9 @@ const LoginScreen = () => {
                   Sign In instead
                 </button>
               </p>
+
+              {/* Demo panel */}
+              <DemoPanel demoLoading={demoLoading} handleDemoLogin={handleDemoLogin} />
             </>
           )}
         </div>
