@@ -51,10 +51,10 @@ const INITIAL_DATA = {
     { email: 'finance@transitops.in', password: 'Finance@123', role: 'Financial Analyst', name: 'Finance Analyst' }
   ],
   rbacRules: {
-    'Fleet Manager': { dashboard: false, fleet: true, drivers: false, trips: false, maintenance: true, fuel: false, analytics: false, settings: true },
-    'Dispatcher': { dashboard: true, fleet: false, drivers: false, trips: true, maintenance: false, fuel: false, analytics: false, settings: false },
-    'Safety Officer': { dashboard: false, fleet: false, drivers: true, trips: false, maintenance: false, fuel: false, analytics: false, settings: false },
-    'Financial Analyst': { dashboard: false, fleet: false, drivers: false, trips: false, maintenance: false, fuel: true, analytics: true, settings: false }
+    'Fleet Manager':     { dashboard: true,  fleet: true,  drivers: true,  trips: false, maintenance: true,  fuel: false, analytics: false, settings: true  },
+    'Dispatcher':        { dashboard: true,  fleet: false, drivers: false, trips: true,  maintenance: false, fuel: false, analytics: false, settings: false },
+    'Safety Officer':    { dashboard: true,  fleet: true,  drivers: true,  trips: false, maintenance: false, fuel: false, analytics: false, settings: false },
+    'Financial Analyst': { dashboard: true,  fleet: false, drivers: false, trips: false, maintenance: false, fuel: true,  analytics: true,  settings: false }
   },
   depotName: 'Gandhinagar Depot GJC',
   currency: 'INR'
