@@ -91,7 +91,7 @@ const AnalyticsView = () => {
       type: 'category',
       data: chartData.map(d => d.name),
       axisLine: { lineStyle: { color: '#71717a' } },
-      axisLabel: { fontFamily: 'Outfit, sans-serif', color: '#fafafa' }
+      axisLabel: { fontFamily: 'DM Sans, sans-serif', color: '#fafafa' }
     },
     yAxis: {
       type: 'value',
@@ -130,7 +130,7 @@ const AnalyticsView = () => {
     legend: {
       orient: 'vertical',
       left: 'left',
-      textStyle: { color: '#fafafa', fontFamily: 'Outfit, sans-serif' }
+      textStyle: { color: '#fafafa', fontFamily: 'DM Sans, sans-serif' }
     },
     series: [
       {

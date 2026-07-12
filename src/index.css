@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Nunito:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 :root {
   /* Color system - Dark Mode by default */
@@ -37,9 +37,11 @@
   --suspended-bg: rgba(244, 63, 94, 0.15);
   
   /* Fonts */
-  --font-hand: 'Architects Daughter', 'Comic Sans MS', cursive;
-  --font-sans: 'Nunito', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-display: 'Space Grotesk', 'Arial Narrow', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  /* Legacy alias: keeps display text unified across the existing UI. */
+  --font-hand: var(--font-display);
   
   --sidebar-width: 250px;
 }
