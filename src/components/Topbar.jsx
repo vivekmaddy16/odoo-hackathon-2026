@@ -1,25 +1,28 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '../context/AppContext';
-import { Sun, Moon, Search, Settings, LogOut, Bell } from 'lucide-react';
+import { Sun, Moon, Search, Shield, Settings, LogOut } from 'lucide-react';
 
 const Topbar = ({ activeTab, setActiveTab, searchQuery, setSearchQuery }) => {
-  const { user, logout, depotName } = useContext(AppContext);
+  const { user, setUser, logout, depotName } = useContext(AppContext);
   const [theme, setTheme] = useState('dark');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
+    // Initial theme set
     document.documentElement.classList.add('dark');
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
   const toggleTheme = () => {
@@ -35,103 +38,167 @@ const Topbar = ({ activeTab, setActiveTab, searchQuery, setSearchQuery }) => {
   };
 
   const formatTitle = (tab) => {
-    const titles = {
-      dashboard:   'Dashboard',
-      fleet:       'Fleet Management',
-      drivers:     'Driver Management',
-      trips:       'Trip Management',
-      maintenance: 'Maintenance Logs',
-      fuel:        'Fuel & Expenses',
-      analytics:   'Reports & Analytics',
-      settings:    'Settings',
-    };
-    return titles[tab] || tab.charAt(0).toUpperCase() + tab.slice(1);
+    if (tab === 'fuel') return 'Fuel & Expense Management';
+    if (tab === 'analytics') return 'Reports & Analytics';
+    return tab.charAt(0).toUpperCase() + tab.slice(1);
   };
 
   if (!user) return null;
 
-  const initials = user.name
-    ? user.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
-    : '??';
-
   return (
     <div className="topbar">
-      {/* Left: page title + depot */}
       <div className="topbar-left">
-        <h2 className="view-title">{formatTitle(activeTab)}</h2>
-        <div className="topbar-divider" />
-        <span className="view-subtitle">{depotName}</span>
+        <h2 className="view-title" style={{ fontFamily: 'var(--font-hand)' }}>
+          {formatTitle(activeTab)}
+        </h2>
+        <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+          | {depotName}
+        </span>
       </div>
-
-      {/* Right: search, actions, avatar */}
+      
       <div className="topbar-right">
-        {/* Search */}
-        <div className="search-wrap">
-          <Search size={15} className="search-icon" />
-          <input
-            id="topbar-search"
-            type="text"
-            placeholder="Search..."
+        {/* Search bar */}
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <Search size={16} style={{ position: 'absolute', left: '12px', color: 'var(--text-muted)' }} />
+          <input 
+            type="text" 
+            placeholder="Search..." 
             className="search-box"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ paddingLeft: '36px' }}
           />
         </div>
 
-        {/* Notifications (decorative) */}
-        <button className="topbar-icon-btn" title="Notifications" aria-label="Notifications">
-          <Bell size={17} />
-        </button>
 
-        {/* Theme toggle */}
-        <button
-          id="theme-toggle"
-          className="topbar-icon-btn"
+
+        {/* Sun/Moon Toggle */}
+        <button 
           onClick={toggleTheme}
-          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          aria-label="Toggle theme"
+          style={{
+            background: 'none',
+            border: '1.5px solid var(--border-color)',
+            borderRadius: '50%',
+            width: '38px',
+            height: '38px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            color: 'var(--text-primary)',
+            backgroundColor: 'var(--card-bg)'
+          }}
         >
-          {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
         </button>
 
-        {/* Avatar / profile dropdown */}
+        {/* User profile dropdown avatar */}
         <div style={{ position: 'relative' }} ref={dropdownRef}>
-          <button
-            id="topbar-avatar"
-            className="topbar-avatar-btn"
+          <button 
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            aria-label="User menu"
-            aria-expanded={dropdownOpen}
+            style={{ 
+              width: '38px', 
+              height: '38px', 
+              borderRadius: '50%', 
+              backgroundColor: '#f1c40f', // Vibrant yellow from sketch
+              color: '#000000', // Black handdrawn characters
+              border: '2px solid var(--text-primary)', // Bold outline
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 'bold',
+              fontSize: '1.05rem',
+              fontFamily: 'var(--font-hand)',
+              cursor: 'pointer',
+              boxShadow: dropdownOpen ? 'none' : '2px 2px 0px var(--border-color)',
+              transform: dropdownOpen ? 'translate(1px, 1px)' : 'none',
+            }}
           >
-            {initials}
+            {user.role === 'Fleet Manager' ? 'FL' : user.name.substring(0, 2).toUpperCase()}
           </button>
 
           {dropdownOpen && (
-            <div className="topbar-dropdown">
-              {/* User info */}
-              <div style={{ marginBottom: '4px' }}>
-                <div className="dropdown-user-name">{user.name}</div>
-                <div className="dropdown-user-email">{user.email}</div>
-                <span className="badge badge-on-trip" style={{ marginTop: '8px', fontSize: '0.72rem' }}>
+            <div 
+              style={{
+                position: 'absolute',
+                top: '48px',
+                right: '0',
+                width: '240px',
+                backgroundColor: 'var(--card-bg)',
+                border: '2px solid var(--border-color)',
+                borderRadius: '12px',
+                boxShadow: '4px 4px 0px rgba(0,0,0,0.15)',
+                padding: '16px',
+                zIndex: 1000,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+                animation: 'fadeIn 0.15s ease-out'
+              }}
+            >
+              {/* Profile Details */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ fontWeight: 'bold', fontSize: '1rem', color: 'var(--text-primary)', textAlign: 'left' }}>
+                  {user.name}
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', textAlign: 'left' }}>
+                  {user.email}
+                </div>
+                <span className="badge badge-available" style={{ alignSelf: 'flex-start', marginTop: '4px', fontSize: '0.75rem', fontWeight: 600 }}>
                   {user.role}
                 </span>
               </div>
 
-              <div className="dropdown-divider" />
+              <div style={{ borderTop: '1px dashed var(--border-color)', margin: '4px 0' }}></div>
 
-              <button
-                className="dropdown-item"
+              {/* Options */}
+              <button 
                 onClick={() => { setActiveTab('settings'); setDropdownOpen(false); }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-secondary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  padding: '8px 4px',
+                  borderRadius: '6px',
+                  width: '100%',
+                  fontSize: '0.9rem',
+                  fontFamily: 'var(--font-sans)',
+                  transition: 'background 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
-                <Settings size={15} />
+                <Settings size={16} />
                 <span>Account Settings</span>
               </button>
 
-              <button
-                className="dropdown-item danger"
+              <button 
                 onClick={() => { logout(); setDropdownOpen(false); }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--error-color)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  padding: '8px 4px',
+                  borderRadius: '6px',
+                  width: '100%',
+                  fontSize: '0.9rem',
+                  fontFamily: 'var(--font-sans)',
+                  transition: 'background 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--error-bg)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
-                <LogOut size={15} />
+                <LogOut size={16} />
                 <span>Sign Out</span>
               </button>
             </div>
