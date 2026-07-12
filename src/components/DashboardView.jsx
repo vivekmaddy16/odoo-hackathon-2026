@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
-import { Truck, Navigation, AlertTriangle, Users, TrendingUp, CheckCircle, Ban } from 'lucide-react';
+import { Truck, Navigation, AlertTriangle, Users, TrendingUp, CheckCircle, Ban, Clock, Percent } from 'lucide-react';
 
 const DashboardView = ({ searchQuery }) => {
   const { vehicles, drivers, trips } = useContext(AppContext);
@@ -121,7 +121,8 @@ const DashboardView = ({ searchQuery }) => {
       {/* KPI Cards Row */}
       <div className="grid-cols-4">
         {/* Active Vehicles */}
-        <div className="card card-handdrawn kpi-card" style={{ borderLeft: '4px solid var(--info-color)' }}>
+        <div className="card card-handdrawn kpi-card kpi-card-info">
+          <Truck size={36} className="kpi-icon-bg" />
           <div className="kpi-label">ACTIVE VEHICLES</div>
           <div className="kpi-value">{activeVehiclesCount}</div>
           <div className="kpi-trend" style={{ color: 'var(--text-muted)' }}>
@@ -130,7 +131,8 @@ const DashboardView = ({ searchQuery }) => {
         </div>
 
         {/* Available Vehicles */}
-        <div className="card card-handdrawn kpi-card" style={{ borderLeft: '4px solid var(--success-color)' }}>
+        <div className="card card-handdrawn kpi-card kpi-card-success">
+          <CheckCircle size={36} className="kpi-icon-bg" />
           <div className="kpi-label">AVAILABLE VEHICLES</div>
           <div className="kpi-value">{availableVehiclesCount}</div>
           <div className="kpi-trend" style={{ color: 'var(--success-color)' }}>
@@ -140,7 +142,8 @@ const DashboardView = ({ searchQuery }) => {
         </div>
 
         {/* Vehicles In Maintenance */}
-        <div className="card card-handdrawn kpi-card" style={{ borderLeft: '4px solid var(--warning-color)' }}>
+        <div className="card card-handdrawn kpi-card kpi-card-warning">
+          <AlertTriangle size={36} className="kpi-icon-bg" />
           <div className="kpi-label">IN MAINTENANCE</div>
           <div className="kpi-value">{String(maintenanceVehiclesCount).padStart(2, '0')}</div>
           <div className="kpi-trend" style={{ color: 'var(--warning-color)' }}>
@@ -150,7 +153,8 @@ const DashboardView = ({ searchQuery }) => {
         </div>
 
         {/* Active Trips */}
-        <div className="card card-handdrawn kpi-card" style={{ borderLeft: '4px solid var(--info-color)' }}>
+        <div className="card card-handdrawn kpi-card kpi-card-info">
+          <Navigation size={36} className="kpi-icon-bg" />
           <div className="kpi-label">ACTIVE TRIPS</div>
           <div className="kpi-value">{activeTripsCount}</div>
           <div className="kpi-trend" style={{ color: 'var(--info-color)' }}>
@@ -160,16 +164,18 @@ const DashboardView = ({ searchQuery }) => {
         </div>
 
         {/* Pending Trips */}
-        <div className="card card-handdrawn kpi-card" style={{ borderLeft: '4px solid var(--text-secondary)' }}>
+        <div className="card card-handdrawn kpi-card kpi-card-accent">
+          <Clock size={36} className="kpi-icon-bg" />
           <div className="kpi-label">PENDING TRIPS</div>
           <div className="kpi-value">{String(pendingTripsCount).padStart(2, '0')}</div>
-          <div className="kpi-trend" style={{ color: 'var(--text-secondary)' }}>
+          <div className="kpi-trend" style={{ color: 'var(--accent-color)' }}>
             <span>Draft status</span>
           </div>
         </div>
 
         {/* Drivers On Duty */}
-        <div className="card card-handdrawn kpi-card" style={{ borderLeft: '4px solid var(--success-color)' }}>
+        <div className="card card-handdrawn kpi-card kpi-card-success">
+          <Users size={36} className="kpi-icon-bg" />
           <div className="kpi-label">DRIVERS ON DUTY</div>
           <div className="kpi-value">{driversOnDutyCount}</div>
           <div className="kpi-trend" style={{ color: 'var(--success-color)' }}>
@@ -179,10 +185,11 @@ const DashboardView = ({ searchQuery }) => {
         </div>
 
         {/* Fleet Utilization */}
-        <div className="card card-handdrawn kpi-card" style={{ borderLeft: '4px solid var(--accent-color)' }}>
+        <div className="card card-handdrawn kpi-card kpi-card-muted">
+          <Percent size={36} className="kpi-icon-bg" />
           <div className="kpi-label">FLEET UTILIZATION</div>
           <div className="kpi-value">{fleetUtilization}%</div>
-          <div className="kpi-trend" style={{ color: 'var(--accent-color)' }}>
+          <div className="kpi-trend" style={{ color: 'var(--text-muted)' }}>
             <span>On Trip / Active</span>
           </div>
         </div>

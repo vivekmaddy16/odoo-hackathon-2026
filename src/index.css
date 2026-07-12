@@ -296,7 +296,6 @@ body {
   padding: 16px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   position: relative;
-  overflow: hidden;
 }
 
 /* Handdrawn elements details */
@@ -318,26 +317,103 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 105px;
+  height: 120px;
+  position: relative;
+  overflow: hidden;
+  padding: 16px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-left: 4px solid var(--border-color);
+}
+
+/* Hover effects with micro-animations */
+.kpi-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 7px 7px 0px var(--kpi-shadow-color, var(--border-color));
+}
+
+.kpi-card-info {
+  --kpi-shadow-color: var(--info-color);
+  border-left: 4px solid var(--info-color) !important;
+}
+
+.kpi-card-success {
+  --kpi-shadow-color: var(--success-color);
+  border-left: 4px solid var(--success-color) !important;
+}
+
+.kpi-card-warning {
+  --kpi-shadow-color: var(--warning-color);
+  border-left: 4px solid var(--warning-color) !important;
+}
+
+.kpi-card-accent {
+  --kpi-shadow-color: var(--accent-color);
+  border-left: 4px solid var(--accent-color) !important;
+}
+
+.kpi-card-muted {
+  --kpi-shadow-color: var(--text-muted);
+  border-left: 4px solid var(--text-muted) !important;
+}
+
+/* KPI background glow */
+.kpi-card::after {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: var(--kpi-shadow-color, var(--border-color));
+  opacity: 0.04;
+  filter: blur(20px);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.kpi-card:hover::after {
+  opacity: 0.1;
+  transform: scale(1.1);
+}
+
+/* absolute positioned background icons */
+.kpi-icon-bg {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  color: var(--kpi-shadow-color, var(--border-color));
+  opacity: 0.08;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  transform: scale(1);
+}
+
+.kpi-card:hover .kpi-icon-bg {
+  opacity: 0.22;
+  transform: scale(1.2) rotate(8deg);
 }
 
 .kpi-label {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
   color: var(--text-secondary);
   font-family: var(--font-hand);
 }
 
 .kpi-value {
-  font-size: 1.8rem;
+  font-size: 2rem;
   font-weight: 800;
   color: var(--text-primary);
   font-family: var(--font-mono);
-  margin-top: 4px;
+  margin-top: 2px;
+  letter-spacing: -0.5px;
 }
 
 .kpi-trend {
   font-size: 0.8rem;
-  margin-top: 4px;
+  margin-top: 2px;
   font-weight: 600;
   display: flex;
   align-items: center;
