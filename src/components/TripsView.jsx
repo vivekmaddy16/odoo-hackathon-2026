@@ -48,7 +48,7 @@ const TripsView = ({ searchQuery }) => {
   const isWeightValid = !selectedVehicle || !cargoWeight || Number(cargoWeight) <= selectedVehicle.capacity;
   const weightExceededBy = selectedVehicle && cargoWeight ? Number(cargoWeight) - selectedVehicle.capacity : 0;
 
-  const handleCreateTrip = (e) => {
+  const handleCreateTrip = async (e) => {
     e.preventDefault();
     setFormError('');
 
@@ -62,25 +62,29 @@ const TripsView = ({ searchQuery }) => {
       return;
     }
 
-    createTrip({
-      source,
-      destination,
-      vehicleId: selectedVehicleId,
-      driverName: selectedDriverName,
-      cargoWeight: Number(cargoWeight),
-      distance: Number(plannedDistance)
-    });
+    try {
+      await createTrip({
+        source,
+        destination,
+        vehicleId: selectedVehicleId,
+        driverName: selectedDriverName,
+        cargoWeight: Number(cargoWeight),
+        distance: Number(plannedDistance)
+      });
 
-    // Reset Form
-    setSource('');
-    setDestination('');
-    setSelectedVehicleId('');
-    setSelectedDriverName('');
-    setCargoWeight('');
-    setPlannedDistance('');
+      // Reset Form on success
+      setSource('');
+      setDestination('');
+      setSelectedVehicleId('');
+      setSelectedDriverName('');
+      setCargoWeight('');
+      setPlannedDistance('');
+    } catch (err) {
+      setFormError(err.message);
+    }
   };
 
-  const handleCompleteSubmit = (e) => {
+  const handleCompleteSubmit = async (e) => {
     e.preventDefault();
     setCompleteError('');
 
@@ -90,7 +94,7 @@ const TripsView = ({ searchQuery }) => {
     }
 
     try {
-      completeTrip(
+      await completeTrip(
         activeCompleteTrip.id,
         Number(finalOdometer),
         Number(fuelLiters || 0),
@@ -98,7 +102,7 @@ const TripsView = ({ searchQuery }) => {
         Number(otherExpenses || 0)
       );
 
-      // Reset & close
+      // Reset & close on success
       setActiveCompleteTrip(null);
       setFinalOdometer('');
       setFuelLiters('');
@@ -117,6 +121,24 @@ const TripsView = ({ searchQuery }) => {
     setFuelCost('');
     setOtherExpenses('');
     setCompleteError('');
+  };
+
+  const handleDispatchTrip = async (tripId) => {
+    try {
+      await dispatchTrip(tripId);
+    } catch (err) {
+      alert(err.message || 'Failed to dispatch trip');
+    }
+  };
+
+  const handleCancelTrip = async (tripId) => {
+    if (window.confirm('Are you sure you want to cancel this trip?')) {
+      try {
+        await cancelTrip(tripId);
+      } catch (err) {
+        alert(err.message || 'Failed to cancel trip');
+      }
+    }
   };
 
   // Search filter
@@ -312,7 +334,7 @@ const TripsView = ({ searchQuery }) => {
                       <>
                         <button 
                           className="btn btn-primary"
-                          onClick={() => dispatchTrip(trip.id)}
+                          onClick={() => handleDispatchTrip(trip.id)}
                           style={{ padding: '6px 12px', fontSize: '0.85rem', flex: 1 }}
                         >
                           <Play size={14} />
@@ -320,7 +342,7 @@ const TripsView = ({ searchQuery }) => {
                         </button>
                         <button 
                           className="btn btn-secondary"
-                          onClick={() => cancelTrip(trip.id)}
+                          onClick={() => handleCancelTrip(trip.id)}
                           style={{ padding: '6px 12px', fontSize: '0.85rem', border: '1.5px solid var(--error-color)', color: 'var(--error-color)' }}
                         >
                           Cancel
@@ -340,7 +362,7 @@ const TripsView = ({ searchQuery }) => {
                         </button>
                         <button 
                           className="btn btn-secondary"
-                          onClick={() => cancelTrip(trip.id)}
+                          onClick={() => handleCancelTrip(trip.id)}
                           style={{ padding: '6px 12px', fontSize: '0.85rem' }}
                         >
                           Cancel

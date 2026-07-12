@@ -21,7 +21,7 @@ const MaintenanceView = ({ searchQuery }) => {
   // Get active non-retired vehicles for dropdown
   const activeVehicles = vehicles.filter(v => v.status !== 'Retired');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -31,22 +31,34 @@ const MaintenanceView = ({ searchQuery }) => {
     }
 
     const selectedVehicle = vehicles.find(v => v.id === vehicleId);
-    if (selectedVehicle.status === 'On Trip') {
+    if (selectedVehicle && selectedVehicle.status === 'On Trip') {
       setError('Cannot put vehicle in maintenance: it is currently on a trip.');
       return;
     }
 
-    addMaintenanceRecord({
-      vehicleId,
-      serviceType,
-      cost: Number(cost),
-      date
-    });
+    try {
+      await addMaintenanceRecord({
+        vehicleId,
+        serviceType,
+        cost: Number(cost),
+        date
+      });
 
-    // Clear fields
-    setVehicleId('');
-    setServiceType('');
-    setCost('');
+      // Clear fields only on success
+      setVehicleId('');
+      setServiceType('');
+      setCost('');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleCloseMaintenance = async (id) => {
+    try {
+      await closeMaintenanceRecord(id);
+    } catch (err) {
+      alert(err.message || 'Failed to close maintenance record');
+    }
   };
 
   // Search filter
@@ -198,7 +210,7 @@ const MaintenanceView = ({ searchQuery }) => {
                       {log.status === 'Active' ? (
                         <button 
                           className="btn btn-primary"
-                          onClick={() => closeMaintenanceRecord(log.id)}
+                          onClick={() => handleCloseMaintenance(log.id)}
                           style={{ 
                             padding: '4px 8px', 
                             fontSize: '0.8rem', 

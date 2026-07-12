@@ -17,6 +17,7 @@ const SettingsView = () => {
   const [localCurrency, setLocalCurrency] = useState(currency);
   const [localRbac, setLocalRbac] = useState({ ...rbacRules });
   const [successMsg, setSuccessMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
   const pages = [
     { id: 'dashboard', label: 'Dashboard' },
@@ -41,17 +42,22 @@ const SettingsView = () => {
     }));
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
     setSuccessMsg('');
+    setErrorMsg('');
 
-    // Save configurations
-    setDepotName(localDepotName.trim());
-    setCurrency(localCurrency);
-    setRbacRules(localRbac);
+    try {
+      // Save configurations
+      await setDepotName(localDepotName.trim());
+      await setCurrency(localCurrency);
+      await setRbacRules(localRbac);
 
-    setSuccessMsg('Settings saved successfully!');
-    setTimeout(() => setSuccessMsg(''), 3000);
+      setSuccessMsg('Settings saved successfully!');
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (err) {
+      setErrorMsg(err.message || 'Failed to save settings');
+    }
   };
 
   return (
@@ -60,6 +66,13 @@ const SettingsView = () => {
         <div className="alert-box alert-success" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
           <CheckCircle size={18} />
           <span>{successMsg}</span>
+        </div>
+      )}
+
+      {errorMsg && (
+        <div className="alert-box alert-danger" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
+          <ShieldAlert size={18} />
+          <span>{errorMsg}</span>
         </div>
       )}
 

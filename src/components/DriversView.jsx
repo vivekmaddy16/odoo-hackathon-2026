@@ -3,7 +3,7 @@ import { AppContext } from '../context/AppContext';
 import { Plus, Trash2, X, AlertCircle } from 'lucide-react';
 
 const DriversView = ({ searchQuery }) => {
-  const { drivers, addDriver, deleteDriver, isLicenseExpired } = useContext(AppContext);
+  const { drivers, addDriver, deleteDriver, updateDriverStatus, isLicenseExpired } = useContext(AppContext);
   
   // States
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,7 +19,7 @@ const DriversView = ({ searchQuery }) => {
   const [error, setError] = useState('');
 
   // Handle submit
-  const handleAddDriver = (e) => {
+  const handleAddDriver = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -29,7 +29,7 @@ const DriversView = ({ searchQuery }) => {
     }
 
     try {
-      addDriver({
+      await addDriver({
         name: newName.trim(),
         licenseNo: newLicenseNo.toUpperCase().trim(),
         category: newCategory,
@@ -39,7 +39,7 @@ const DriversView = ({ searchQuery }) => {
         status: 'Available'
       });
 
-      // Clear fields and close
+      // Clear fields and close only on success
       setNewName('');
       setNewLicenseNo('');
       setNewCategory('LMV');
@@ -49,6 +49,16 @@ const DriversView = ({ searchQuery }) => {
       setIsModalOpen(false);
     } catch (err) {
       setError(err.message);
+    }
+  };
+
+  const handleDeleteDriver = async (licenseNo) => {
+    if (window.confirm('Are you sure you want to delete this driver?')) {
+      try {
+        await deleteDriver(licenseNo);
+      } catch (err) {
+        alert(err.message || 'Failed to delete driver');
+      }
     }
   };
 
@@ -147,13 +157,32 @@ const DriversView = ({ searchQuery }) => {
                       </div>
                     </td>
                     <td>
-                      <span className={`badge ${getStatusBadge(driver.status, driver.expiryDate)}`}>
-                        {expired ? 'Expired' : driver.status}
-                      </span>
+                       <select
+                         className={`status-select-pill badge ${getStatusBadge(driver.status, driver.expiryDate)}`}
+                         value={driver.status}
+                         disabled={driver.status === 'On Trip' || expired}
+                         onChange={async (e) => {
+                           try {
+                             await updateDriverStatus(driver.licenseNo, e.target.value);
+                           } catch (err) {
+                             alert(err.message || 'Failed to update driver status');
+                           }
+                         }}
+                       >
+                         <option value="Available">Available</option>
+                         <option value="Off Duty">Off Duty</option>
+                         <option value="Suspended">Suspended</option>
+                         {driver.status === 'On Trip' && (
+                           <option value="On Trip">On Trip</option>
+                         )}
+                         {expired && (
+                           <option value={driver.status}>Expired</option>
+                         )}
+                       </select>
                     </td>
                     <td>
                       <button 
-                        onClick={() => deleteDriver(driver.licenseNo)}
+                        onClick={() => handleDeleteDriver(driver.licenseNo)}
                         disabled={driver.status === 'On Trip'}
                         className="btn btn-danger"
                         style={{ padding: '6px 10px', fontSize: '0.8rem', boxShadow: 'none' }}

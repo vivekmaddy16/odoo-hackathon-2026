@@ -9,6 +9,7 @@ const FuelExpenseView = ({ searchQuery }) => {
     expenses, 
     logDirectFuel, 
     logDirectExpense, 
+    updateExpenseType,
     currency 
   } = useContext(AppContext);
 
@@ -28,7 +29,7 @@ const FuelExpenseView = ({ searchQuery }) => {
   const [error, setError] = useState('');
 
   // Submit fuel
-  const handleFuelSubmit = (e) => {
+  const handleFuelSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -37,16 +38,20 @@ const FuelExpenseView = ({ searchQuery }) => {
       return;
     }
 
-    logDirectFuel(vehicleId, date, liters, fuelCost);
-    
-    // Clear
-    setVehicleId('');
-    setLiters('');
-    setFuelCost('');
+    try {
+      await logDirectFuel(vehicleId, date, liters, fuelCost);
+      
+      // Clear on success
+      setVehicleId('');
+      setLiters('');
+      setFuelCost('');
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   // Submit expense
-  const handleExpenseSubmit = (e) => {
+  const handleExpenseSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -55,11 +60,15 @@ const FuelExpenseView = ({ searchQuery }) => {
       return;
     }
 
-    logDirectExpense(vehicleId, date, expenseType, amount);
-    
-    // Clear
-    setVehicleId('');
-    setAmount('');
+    try {
+      await logDirectExpense(vehicleId, date, expenseType, amount);
+      
+      // Clear on success
+      setVehicleId('');
+      setAmount('');
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   // Calculate Operational Cost (Fuel + Maintenance) per Vehicle
@@ -342,13 +351,28 @@ const FuelExpenseView = ({ searchQuery }) => {
                     <td className="td-mono" style={{ fontWeight: 'bold' }}>{exp.vehicleId}</td>
                     <td className="td-mono">{exp.date}</td>
                     <td>
-                      <span className={`badge ${
-                        exp.type === 'Fuel' ? 'badge-on-trip' :
-                        exp.type === 'Maintenance' ? 'badge-in-shop' :
-                        'badge-retired'
-                      }`}>
-                        {exp.type}
-                      </span>
+                      <select
+                        className={`status-select-pill badge ${
+                          exp.type === 'Fuel' ? 'badge-on-trip' :
+                          exp.type === 'Maintenance' ? 'badge-in-shop' :
+                          'badge-retired'
+                        }`}
+                        value={exp.type}
+                        onChange={async (e) => {
+                          try {
+                            await updateExpenseType(exp.id, e.target.value);
+                          } catch (err) {
+                            alert(err.message || 'Failed to update expense category');
+                          }
+                        }}
+                      >
+                        <option value="Fuel">Fuel</option>
+                        <option value="Maintenance">Maintenance</option>
+                        <option value="Tolls">Tolls</option>
+                        <option value="Fines">Fines</option>
+                        <option value="Insurance">Insurance</option>
+                        <option value="Misc">Misc</option>
+                      </select>
                     </td>
                     <td className="td-mono" style={{ fontWeight: 'bold' }}>{formatCurrency(exp.amount)}</td>
                   </tr>

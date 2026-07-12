@@ -1,9 +1,10 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import { Truck, Navigation, AlertTriangle, Users, TrendingUp, CheckCircle, Ban } from 'lucide-react';
+import LiveRouteMap from './LiveRouteMap';
 
 const DashboardView = ({ searchQuery }) => {
-  const { vehicles, drivers, trips } = useContext(AppContext);
+  const { vehicles, drivers, trips, updateTripStatus } = useContext(AppContext);
 
   // Filters state
   const [filterType, setFilterType] = useState('All');
@@ -188,6 +189,11 @@ const DashboardView = ({ searchQuery }) => {
         </div>
       </div>
 
+      {/* Real-time Tracker Simulation */}
+      <div style={{ marginBottom: '24px' }}>
+        <LiveRouteMap trips={trips} />
+      </div>
+
       {/* Main Content Split */}
       <div className="grid-cols-2">
         {/* Recent Trips Table */}
@@ -219,14 +225,27 @@ const DashboardView = ({ searchQuery }) => {
                     <td>{trip.vehicleId}</td>
                     <td>{trip.driverName}</td>
                     <td>
-                      <span className={`badge ${
-                        trip.status === 'Completed' ? 'badge-available' :
-                        trip.status === 'Dispatched' ? 'badge-on-trip' :
-                        trip.status === 'Cancelled' ? 'badge-danger' :
-                        'badge-retired'
-                      }`}>
-                        {trip.status}
-                      </span>
+                      <select
+                        className={`status-select-pill badge ${
+                          trip.status === 'Completed' ? 'badge-available' :
+                          trip.status === 'Dispatched' ? 'badge-on-trip' :
+                          trip.status === 'Cancelled' ? 'badge-danger' :
+                          'badge-retired'
+                        }`}
+                        value={trip.status}
+                        onChange={async (e) => {
+                          try {
+                            await updateTripStatus(trip.id, e.target.value);
+                          } catch (err) {
+                            alert(err.message || 'Failed to update trip status');
+                          }
+                        }}
+                      >
+                        <option value="Draft">Draft</option>
+                        <option value="Dispatched">Dispatched</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
+                      </select>
                     </td>
                     <td style={{ fontSize: '0.85rem' }}>
                       {trip.status === 'Completed' && 'Arrived'}

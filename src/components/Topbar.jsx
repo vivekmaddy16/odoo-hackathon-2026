@@ -1,14 +1,28 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '../context/AppContext';
-import { Sun, Moon, Search, Shield } from 'lucide-react';
+import { Sun, Moon, Search, Shield, Settings, LogOut } from 'lucide-react';
 
-const Topbar = ({ activeTab, searchQuery, setSearchQuery }) => {
-  const { user, setUser, depotName } = useContext(AppContext);
+const Topbar = ({ activeTab, setActiveTab, searchQuery, setSearchQuery }) => {
+  const { user, setUser, logout, depotName } = useContext(AppContext);
   const [theme, setTheme] = useState('dark');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     // Initial theme set
     document.documentElement.classList.add('dark');
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
   const toggleTheme = () => {
@@ -21,15 +35,6 @@ const Topbar = ({ activeTab, searchQuery, setSearchQuery }) => {
       document.documentElement.classList.add('dark');
       setTheme('dark');
     }
-  };
-
-  const handleRoleChange = (e) => {
-    const selectedRole = e.target.value;
-    // Update active user with new role
-    setUser(prev => ({
-      ...prev,
-      role: selectedRole
-    }));
   };
 
   const formatTitle = (tab) => {
@@ -65,21 +70,7 @@ const Topbar = ({ activeTab, searchQuery, setSearchQuery }) => {
           />
         </div>
 
-        {/* Quick RBAC role switcher for demonstration */}
-        <div className="quick-role-switch">
-          <Shield size={16} style={{ color: 'var(--accent-color)' }} />
-          <span>Role:</span>
-          <select 
-            value={user.role} 
-            onChange={handleRoleChange}
-            className="quick-role-select"
-          >
-            <option value="Dispatcher">Dispatcher</option>
-            <option value="Fleet Manager">Fleet Manager</option>
-            <option value="Safety Officer">Safety Officer</option>
-            <option value="Financial Analyst">Financial Analyst</option>
-          </select>
-        </div>
+
 
         {/* Sun/Moon Toggle */}
         <button 
@@ -101,24 +92,117 @@ const Topbar = ({ activeTab, searchQuery, setSearchQuery }) => {
           {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
         </button>
 
-        {/* User profile card */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div 
+        {/* User profile dropdown avatar */}
+        <div style={{ position: 'relative' }} ref={dropdownRef}>
+          <button 
+            onClick={() => setDropdownOpen(!dropdownOpen)}
             style={{ 
-              width: '36px', 
-              height: '36px', 
+              width: '38px', 
+              height: '38px', 
               borderRadius: '50%', 
-              backgroundColor: 'var(--accent-color)', 
-              color: 'var(--accent-text)',
+              backgroundColor: '#f1c40f', // Vibrant yellow from sketch
+              color: '#000000', // Black handdrawn characters
+              border: '2px solid var(--text-primary)', // Bold outline
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 'bold',
-              fontFamily: 'var(--font-hand)'
+              fontSize: '1.05rem',
+              fontFamily: 'var(--font-hand)',
+              cursor: 'pointer',
+              boxShadow: dropdownOpen ? 'none' : '2px 2px 0px var(--border-color)',
+              transform: dropdownOpen ? 'translate(1px, 1px)' : 'none',
             }}
           >
-            {user.name.substring(0, 2).toUpperCase()}
-          </div>
+            {user.role === 'Fleet Manager' ? 'FL' : user.name.substring(0, 2).toUpperCase()}
+          </button>
+
+          {dropdownOpen && (
+            <div 
+              style={{
+                position: 'absolute',
+                top: '48px',
+                right: '0',
+                width: '240px',
+                backgroundColor: 'var(--card-bg)',
+                border: '2px solid var(--border-color)',
+                borderRadius: '12px',
+                boxShadow: '4px 4px 0px rgba(0,0,0,0.15)',
+                padding: '16px',
+                zIndex: 1000,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+                animation: 'fadeIn 0.15s ease-out'
+              }}
+            >
+              {/* Profile Details */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ fontWeight: 'bold', fontSize: '1rem', color: 'var(--text-primary)', textAlign: 'left' }}>
+                  {user.name}
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', textAlign: 'left' }}>
+                  {user.email}
+                </div>
+                <span className="badge badge-available" style={{ alignSelf: 'flex-start', marginTop: '4px', fontSize: '0.75rem', fontWeight: 600 }}>
+                  {user.role}
+                </span>
+              </div>
+
+              <div style={{ borderTop: '1px dashed var(--border-color)', margin: '4px 0' }}></div>
+
+              {/* Options */}
+              <button 
+                onClick={() => { setActiveTab('settings'); setDropdownOpen(false); }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-secondary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  padding: '8px 4px',
+                  borderRadius: '6px',
+                  width: '100%',
+                  fontSize: '0.9rem',
+                  fontFamily: 'var(--font-sans)',
+                  transition: 'background 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                <Settings size={16} />
+                <span>Account Settings</span>
+              </button>
+
+              <button 
+                onClick={() => { logout(); setDropdownOpen(false); }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--error-color)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  padding: '8px 4px',
+                  borderRadius: '6px',
+                  width: '100%',
+                  fontSize: '0.9rem',
+                  fontFamily: 'var(--font-sans)',
+                  transition: 'background 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--error-bg)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                <LogOut size={16} />
+                <span>Sign Out</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

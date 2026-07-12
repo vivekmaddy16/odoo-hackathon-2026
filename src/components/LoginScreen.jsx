@@ -1,23 +1,24 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { AppContext } from '../context/AppContext';
-import { AlertCircle, Lock, LogIn, Zap, Shield, Truck, Navigation, BarChart3, Eye, EyeOff } from 'lucide-react';
+import { AlertCircle, Lock, LogIn, Shield, Truck, Navigation, BarChart3, Eye, EyeOff, UserPlus } from 'lucide-react';
 
 const LoginScreen = () => {
-  const { login, demoLogin } = useContext(AppContext);
+  const { login, register } = useContext(AppContext);
+  
+  // Tab toggle: 'signin' | 'signup'
+  const [authMode, setAuthMode] = useState('signin');
+  
+  // Credentials/Registration states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [role, setRole] = useState('Dispatcher');
+  const [roleKey, setRoleKey] = useState('');
+
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [lockedTime, setLockedTime] = useState(0);
-
-  // Demo accounts info for display
-  const demoAccounts = [
-    { role: 'Fleet Manager', icon: Truck, email: 'fleet@transitops.in', password: 'Fleet@123', scope: 'Fleet, Maintenance, Settings', color: 'var(--info-color)' },
-    { role: 'Dispatcher', icon: Navigation, email: 'dispatcher@transitops.in', password: 'Dispatch@123', scope: 'Dashboard, Trips', color: 'var(--success-color)' },
-    { role: 'Safety Officer', icon: Shield, email: 'safety@transitops.in', password: 'Safety@123', scope: 'Drivers', color: 'var(--warning-color)' },
-    { role: 'Financial Analyst', icon: BarChart3, email: 'finance@transitops.in', password: 'Finance@123', scope: 'Fuel & Expenses, Analytics', color: 'var(--accent-color)' }
-  ];
 
   useEffect(() => {
     let interval = null;
@@ -31,7 +32,7 @@ const LoginScreen = () => {
     return () => clearInterval(interval);
   }, [lockedTime, failedAttempts]);
 
-  const handleSubmit = (e) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
     if (lockedTime > 0) return;
 
@@ -40,7 +41,7 @@ const LoginScreen = () => {
       return;
     }
 
-    const result = login(email, password);
+    const result = await login(email, password);
     if (result.success) {
       setError('');
       setFailedAttempts(0);
@@ -61,14 +62,28 @@ const LoginScreen = () => {
     }
   };
 
-  const handleDemoLogin = (role) => {
-    if (lockedTime > 0) return;
-    demoLogin(role);
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    if (!name || !email || !password || !role || !roleKey) {
+      setError('All fields are required.');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+
+    try {
+      await register(name, email, password, role, roleKey);
+      setError('');
+    } catch (err) {
+      setError(err.message || 'Failed to create account.');
+    }
   };
 
   return (
     <div className="login-screen">
-      {/* Left panel: Branding */}
+      {/* Left panel: Branding and access explanation */}
       <div className="login-left">
         <div className="login-logo-container">
           <h1 className="login-logo">TransitOps</h1>
@@ -77,202 +92,232 @@ const LoginScreen = () => {
           <div className="role-helper-list" style={{ marginTop: '32px' }}>
             <h4 style={{ marginBottom: '16px', fontSize: '1rem' }}>Role-Based Access Control</h4>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
-              Each role has unique credentials and restricted access to specific modules.
+              TransitOps enforces secure access controls. To register an account for a specific operational role, you must enter the authorized Security Access Key.
             </p>
-            <ul>
-              {demoAccounts.map(acc => {
-                const Icon = acc.icon;
-                return (
-                  <li
-                    key={acc.role}
-                    style={{
-                      border: '1px dashed var(--border-color)',
-                      padding: '10px 14px',
-                      borderRadius: '8px',
-                      marginBottom: '8px',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '10px',
-                      cursor: 'default'
-                    }}
-                  >
-                    <Icon size={16} style={{ color: acc.color, marginTop: '2px', flexShrink: 0 }} />
-                    <div>
-                      <div style={{ fontWeight: 'bold', color: 'var(--text-primary)', fontSize: '0.9rem' }}>{acc.role}</div>
-                      <div style={{ fontSize: '0.75rem', color: acc.color, marginTop: '2px' }}>
-                        Access: {acc.scope}
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
+            <ul style={{ listStyle: 'none', padding: 0 }}>
+              <li style={{ border: '1px dashed var(--border-color)', padding: '10px 14px', borderRadius: '8px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Truck size={16} style={{ color: 'var(--info-color)' }} />
+                <div>
+                  <div style={{ fontWeight: 'bold', fontSize: '0.85rem' }}>Fleet Manager</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Manages fleet registry, maintenance, and system configurations.</div>
+                </div>
+              </li>
+              <li style={{ border: '1px dashed var(--border-color)', padding: '10px 14px', borderRadius: '8px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Navigation size={16} style={{ color: 'var(--success-color)' }} />
+                <div>
+                  <div style={{ fontWeight: 'bold', fontSize: '0.85rem' }}>Dispatcher</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Dispatches active shipments, plans routes, and updates trip status.</div>
+                </div>
+              </li>
+              <li style={{ border: '1px dashed var(--border-color)', padding: '10px 14px', borderRadius: '8px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Shield size={16} style={{ color: 'var(--warning-color)' }} />
+                <div>
+                  <div style={{ fontWeight: 'bold', fontSize: '0.85rem' }}>Safety Officer</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Oversees driver profiles, safety logs, and license validation.</div>
+                </div>
+              </li>
+              <li style={{ border: '1px dashed var(--border-color)', padding: '10px 14px', borderRadius: '8px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <BarChart3 size={16} style={{ color: 'var(--accent-color)' }} />
+                <div>
+                  <div style={{ fontWeight: 'bold', fontSize: '0.85rem' }}>Financial Analyst</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Tracks fuel logs, direct transaction ledgers, and operational costs.</div>
+                </div>
+              </li>
             </ul>
           </div>
         </div>
       </div>
 
-      {/* Right panel: Auth form + Demo login */}
+      {/* Right panel: Auth form */}
       <div className="login-right">
         <div style={{ width: '100%', maxWidth: '420px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
           
-          {/* Main Auth Form Card */}
           <div className="login-form-card">
-            <h2 className="login-form-title">Sign in to your account</h2>
-            <p className="login-form-subtitle">Enter your credentials to continue</p>
+            {authMode === 'signin' ? (
+              <>
+                <h2 className="login-form-title">Sign in to your account</h2>
+                <p className="login-form-subtitle">Enter your credentials to continue</p>
 
-            {error && (
-              <div className="alert-box alert-danger">
-                <AlertCircle size={16} />
-                <span>{error}</span>
-              </div>
-            )}
+                {error && (
+                  <div className="alert-box alert-danger">
+                    <AlertCircle size={16} />
+                    <span>{error}</span>
+                  </div>
+                )}
 
-            {lockedTime > 0 && (
-              <div className="alert-box alert-warning" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Lock size={14} />
-                <span>Locked — try again in {lockedTime}s</span>
-              </div>
-            )}
+                {lockedTime > 0 && (
+                  <div className="alert-box alert-warning" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Lock size={14} />
+                    <span>Locked — try again in {lockedTime}s</span>
+                  </div>
+                )}
 
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label className="form-label">Email Address</label>
-                <input
-                  type="email"
-                  className="form-input"
-                  placeholder="e.g. fleet@transitops.in"
-                  value={email}
-                  onChange={(e) => { setEmail(e.target.value); setError(''); }}
-                  disabled={lockedTime > 0}
-                  autoComplete="email"
-                />
-              </div>
+                <form onSubmit={handleSignIn}>
+                  <div className="form-group">
+                    <label className="form-label">Email Address</label>
+                    <input
+                      type="email"
+                      className="form-input"
+                      placeholder="e.g. fleet@transitops.in"
+                      value={email}
+                      onChange={(e) => { setEmail(e.target.value); setError(''); }}
+                      disabled={lockedTime > 0}
+                      autoComplete="email"
+                    />
+                  </div>
 
-              <div className="form-group">
-                <label className="form-label">Password</label>
-                <div style={{ position: 'relative' }}>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    className="form-input"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => { setPassword(e.target.value); setError(''); }}
-                    disabled={lockedTime > 0}
-                    autoComplete="current-password"
-                    style={{ paddingRight: '40px' }}
-                  />
+                  <div className="form-group">
+                    <label className="form-label">Password</label>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        className="form-input"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => { setPassword(e.target.value); setError(''); }}
+                        disabled={lockedTime > 0}
+                        autoComplete="current-password"
+                        style={{ paddingRight: '40px' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        style={{
+                          position: 'absolute',
+                          right: '10px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--text-muted)',
+                          cursor: 'pointer',
+                          padding: '4px',
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}
+                      >
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                  </div>
+
                   <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    style={{
-                      position: 'absolute',
-                      right: '10px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'none',
-                      border: 'none',
-                      color: 'var(--text-muted)',
-                      cursor: 'pointer',
-                      padding: '4px',
-                      display: 'flex',
-                      alignItems: 'center'
-                    }}
+                    type="submit"
+                    className="btn btn-primary"
+                    style={{ width: '100%', padding: '11px', fontSize: '1rem', marginTop: '16px' }}
+                    disabled={lockedTime > 0}
                   >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    <LogIn size={16} />
+                    <span>Sign In</span>
                   </button>
+                </form>
+
+                <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  Don't have an account?{' '}
+                  <span
+                    onClick={() => { setAuthMode('signup'); setError(''); }}
+                    style={{ color: 'var(--accent-color)', cursor: 'pointer', fontWeight: 'bold' }}
+                  >
+                    Create one here
+                  </span>
                 </div>
-              </div>
+              </>
+            ) : (
+              <>
+                <h2 className="login-form-title">Create your account</h2>
+                <p className="login-form-subtitle">Register a new secure operational profile</p>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '16px 0' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
-                  <input type="checkbox" style={{ accentColor: 'var(--accent-color)' }} defaultChecked />
-                  <span>Remember me</span>
-                </label>
-                <a
-                  href="#"
-                  style={{ color: 'var(--accent-color)', fontSize: '0.85rem', textDecoration: 'none' }}
-                  onClick={(e) => { e.preventDefault(); alert('Contact your admin to reset credentials.'); }}
-                >
-                  Forgot password?
-                </a>
-              </div>
+                {error && (
+                  <div className="alert-box alert-danger">
+                    <AlertCircle size={16} />
+                    <span>{error}</span>
+                  </div>
+                )}
 
-              <button
-                type="submit"
-                className="btn btn-primary"
-                style={{ width: '100%', padding: '11px', fontSize: '1rem' }}
-                disabled={lockedTime > 0}
-              >
-                <LogIn size={16} />
-                <span>Sign In</span>
-              </button>
-            </form>
-          </div>
+                <form onSubmit={handleSignUp}>
+                  <div className="form-group">
+                    <label className="form-label">Full Name</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="e.g. John Doe"
+                      value={name}
+                      onChange={(e) => { setName(e.target.value); setError(''); }}
+                      required
+                    />
+                  </div>
 
-          {/* Demo Login Section for Judges */}
-          <div
-            style={{
-              border: '2px dashed var(--border-color)',
-              borderRadius: '12px',
-              padding: '16px',
-              backgroundColor: 'rgba(234, 179, 8, 0.03)'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <Zap size={16} style={{ color: 'var(--accent-color)' }} />
-              <span style={{ fontFamily: 'var(--font-hand)', fontWeight: 'bold', fontSize: '0.95rem', color: 'var(--accent-color)' }}>
-                Quick Demo Login
-              </span>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: 'auto' }}>
-                For evaluation
-              </span>
-            </div>
+                  <div className="form-group">
+                    <label className="form-label">Email Address</label>
+                    <input
+                      type="email"
+                      className="form-input"
+                      placeholder="e.g. john@transitops.in"
+                      value={email}
+                      onChange={(e) => { setEmail(e.target.value); setError(''); }}
+                      required
+                    />
+                  </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-              {demoAccounts.map(acc => {
-                const Icon = acc.icon;
-                return (
+                  <div className="form-group">
+                    <label className="form-label">Password</label>
+                    <input
+                      type="password"
+                      className="form-input"
+                      placeholder="Min. 6 characters"
+                      value={password}
+                      onChange={(e) => { setPassword(e.target.value); setError(''); }}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Role</label>
+                    <select
+                      className="form-select"
+                      value={role}
+                      onChange={(e) => { setRole(e.target.value); setError(''); }}
+                    >
+                      <option value="Fleet Manager">Fleet Manager</option>
+                      <option value="Dispatcher">Dispatcher</option>
+                      <option value="Safety Officer">Safety Officer</option>
+                      <option value="Financial Analyst">Financial Analyst</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Role Authorization Key</label>
+                    <input
+                      type="password"
+                      className="form-input"
+                      placeholder="Required for role authorization"
+                      value={roleKey}
+                      onChange={(e) => { setRoleKey(e.target.value); setError(''); }}
+                      required
+                    />
+                  </div>
+
                   <button
-                    key={acc.role}
-                    onClick={() => handleDemoLogin(acc.role)}
-                    disabled={lockedTime > 0}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      padding: '10px 12px',
-                      backgroundColor: 'var(--card-bg)',
-                      border: '1.5px solid var(--border-color)',
-                      borderRadius: '8px',
-                      color: 'var(--text-primary)',
-                      cursor: lockedTime > 0 ? 'not-allowed' : 'pointer',
-                      fontFamily: 'var(--font-hand)',
-                      fontSize: '0.85rem',
-                      fontWeight: 'bold',
-                      transition: 'all 0.15s ease',
-                      opacity: lockedTime > 0 ? 0.4 : 1
-                    }}
-                    onMouseEnter={(e) => {
-                      if (lockedTime <= 0) {
-                        e.currentTarget.style.borderColor = acc.color;
-                        e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.03)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--border-color)';
-                      e.currentTarget.style.backgroundColor = 'var(--card-bg)';
-                    }}
+                    type="submit"
+                    className="btn btn-primary"
+                    style={{ width: '100%', padding: '11px', fontSize: '1rem', marginTop: '16px' }}
                   >
-                    <Icon size={14} style={{ color: acc.color, flexShrink: 0 }} />
-                    <span>{acc.role}</span>
+                    <UserPlus size={16} />
+                    <span>Create Account</span>
                   </button>
-                );
-              })}
-            </div>
+                </form>
 
-            <div style={{ marginTop: '10px', fontSize: '0.7rem', color: 'var(--text-muted)', textAlign: 'center' }}>
-              One-click login — no credentials needed
-            </div>
+                <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  Already have an account?{' '}
+                  <span
+                    onClick={() => { setAuthMode('signin'); setError(''); }}
+                    style={{ color: 'var(--accent-color)', cursor: 'pointer', fontWeight: 'bold' }}
+                  >
+                    Sign In instead
+                  </span>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Security and local database
+.env
+*.env
+db.json
+server/db.json

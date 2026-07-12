@@ -3,7 +3,7 @@ import { AppContext } from '../context/AppContext';
 import { Plus, Trash2, X, AlertCircle } from 'lucide-react';
 
 const FleetView = ({ searchQuery }) => {
-  const { vehicles, addVehicle, deleteVehicle, currency } = useContext(AppContext);
+  const { vehicles, addVehicle, deleteVehicle, updateVehicleStatus, currency } = useContext(AppContext);
   
   // States
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,7 +21,7 @@ const FleetView = ({ searchQuery }) => {
   const [error, setError] = useState('');
 
   // Handle submit
-  const handleAddVehicle = (e) => {
+  const handleAddVehicle = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -31,7 +31,7 @@ const FleetView = ({ searchQuery }) => {
     }
 
     try {
-      addVehicle({
+      await addVehicle({
         id: newId.toUpperCase().trim(),
         model: newModel.trim(),
         type: newType,
@@ -41,7 +41,7 @@ const FleetView = ({ searchQuery }) => {
         region: newRegion
       });
 
-      // Clear fields and close
+      // Clear fields and close only on success
       setNewId('');
       setNewModel('');
       setNewType('Van');
@@ -51,6 +51,16 @@ const FleetView = ({ searchQuery }) => {
       setIsModalOpen(false);
     } catch (err) {
       setError(err.message);
+    }
+  };
+
+  const handleDeleteVehicle = async (id) => {
+    if (window.confirm('Are you sure you want to delete this vehicle?')) {
+      try {
+        await deleteVehicle(id);
+      } catch (err) {
+        alert(err.message || 'Failed to delete vehicle');
+      }
     }
   };
 
@@ -156,13 +166,29 @@ const FleetView = ({ searchQuery }) => {
                   <td className="td-mono">{vehicle.odometer.toLocaleString()}</td>
                   <td className="td-mono">{formatCurrency(vehicle.acqCost)}</td>
                   <td>
-                    <span className={`badge ${getStatusBadge(vehicle.status)}`}>
-                      {vehicle.status}
-                    </span>
+                    <select
+                      className={`status-select-pill badge ${getStatusBadge(vehicle.status)}`}
+                      value={vehicle.status}
+                      disabled={vehicle.status === 'On Trip'}
+                      onChange={async (e) => {
+                        try {
+                          await updateVehicleStatus(vehicle.id, e.target.value);
+                        } catch (err) {
+                          alert(err.message || 'Failed to update vehicle status');
+                        }
+                      }}
+                    >
+                      <option value="Available">Available</option>
+                      <option value="In Shop">In Shop</option>
+                      <option value="Retired">Retired</option>
+                      {vehicle.status === 'On Trip' && (
+                        <option value="On Trip">On Trip</option>
+                      )}
+                    </select>
                   </td>
                   <td>
                     <button 
-                      onClick={() => deleteVehicle(vehicle.id)}
+                      onClick={() => handleDeleteVehicle(vehicle.id)}
                       disabled={vehicle.status === 'On Trip'}
                       className="btn btn-danger"
                       style={{ padding: '6px 10px', fontSize: '0.8rem', boxShadow: 'none' }}
