@@ -2,8 +2,15 @@ import React, { useState, useContext, useEffect } from 'react';
 import { AppContext } from '../context/AppContext';
 import {
   AlertCircle, Lock, LogIn, Shield, Truck, Navigation,
-  BarChart3, Eye, EyeOff, UserPlus, CheckCircle, Key
+  BarChart3, Eye, EyeOff, UserPlus, CheckCircle, Key, Zap
 } from 'lucide-react';
+
+const DEMO_ACCOUNTS = [
+  { role: 'Fleet Manager',     email: 'fleet@transitops.in',      password: 'Fleet@123',    icon: Truck,    color: '#3b82f6' },
+  { role: 'Dispatcher',        email: 'dispatcher@transitops.in', password: 'Dispatch@123', icon: Navigation, color: '#10b981' },
+  { role: 'Safety Officer',    email: 'safety@transitops.in',     password: 'Safety@123',   icon: Shield,   color: '#f59e0b' },
+  { role: 'Financial Analyst', email: 'finance@transitops.in',    password: 'Finance@123',  icon: BarChart3, color: '#6366f1' },
+];
 
 const ROLES = [
   {
@@ -45,6 +52,7 @@ const LoginScreen = () => {
   const [error, setError]             = useState('');
   const [successMsg, setSuccessMsg]   = useState('');
   const [loading, setLoading]         = useState(false);
+  const [demoLoading, setDemoLoading] = useState(null);
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [lockedTime, setLockedTime]   = useState(0);
 
@@ -62,6 +70,16 @@ const LoginScreen = () => {
     setAuthMode(mode);
     setError('');
     setSuccessMsg('');
+  };
+
+  const handleDemoLogin = async (account) => {
+    setDemoLoading(account.role);
+    setError('');
+    const result = await login(account.email, account.password);
+    if (!result.success) {
+      setError('Demo login failed. Please ensure the backend server is running.');
+    }
+    setDemoLoading(null);
   };
 
   const handleSignIn = async (e) => {
@@ -121,6 +139,67 @@ const LoginScreen = () => {
           <div>
             <div className="login-logo-name">TransitOps</div>
             <div className="login-logo-tagline">Fleet Operations Platform</div>
+          </div>
+        </div>
+
+        {/* Demo quick-access */}
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 1,
+            width: '100%',
+            maxWidth: 440,
+            marginBottom: 32,
+            background: 'rgba(99,102,241,0.07)',
+            border: '1px solid rgba(99,102,241,0.22)',
+            borderRadius: 16,
+            padding: '18px 20px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+            <Zap size={15} style={{ color: '#818cf8' }} />
+            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#818cf8', textTransform: 'uppercase', letterSpacing: '0.8px', fontFamily: 'var(--font-ui)' }}>
+              Try Demo — No Registration Needed
+            </span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            {DEMO_ACCOUNTS.map((acc) => {
+              const Icon = acc.icon;
+              const isThisLoading = demoLoading === acc.role;
+              return (
+                <button
+                  key={acc.role}
+                  onClick={() => handleDemoLogin(acc)}
+                  disabled={!!demoLoading}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 9,
+                    padding: '9px 12px',
+                    borderRadius: 10,
+                    border: `1px solid ${acc.color}33`,
+                    background: `${acc.color}14`,
+                    color: acc.color,
+                    cursor: demoLoading ? 'wait' : 'pointer',
+                    fontFamily: 'var(--font-ui)',
+                    fontSize: '0.82rem',
+                    fontWeight: 600,
+                    transition: 'all 0.18s ease',
+                    opacity: demoLoading && !isThisLoading ? 0.45 : 1,
+                    textAlign: 'left',
+                  }}
+                  onMouseEnter={(e) => { if (!demoLoading) e.currentTarget.style.background = `${acc.color}26`; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = `${acc.color}14`; }}
+                >
+                  {isThisLoading ? (
+                    <span style={{ width: 16, height: 16, border: `2px solid ${acc.color}44`, borderTop: `2px solid ${acc.color}`, borderRadius: '50%', animation: 'spin 0.7s linear infinite', flexShrink: 0, display: 'inline-block' }} />
+                  ) : (
+                    <Icon size={15} style={{ flexShrink: 0 }} />
+                  )}
+                  <span>{acc.role}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
