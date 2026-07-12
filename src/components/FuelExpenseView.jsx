@@ -3,29 +3,29 @@ import { AppContext } from '../context/AppContext';
 import { Plus, Fuel, DollarSign, ListFilter, AlertCircle } from 'lucide-react';
 
 const FuelExpenseView = ({ searchQuery }) => {
-  const { 
-    vehicles, 
-    fuelLogs, 
-    expenses, 
-    logDirectFuel, 
-    logDirectExpense, 
+  const {
+    vehicles,
+    fuelLogs,
+    expenses,
+    logDirectFuel,
+    logDirectExpense,
     updateExpenseType,
-    currency 
+    currency
   } = useContext(AppContext);
 
   // States
   const [activeForm, setActiveForm] = useState('fuel'); // 'fuel' or 'expense'
   const [vehicleId, setVehicleId] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  
+
   // Fuel fields
   const [liters, setLiters] = useState('');
   const [fuelCost, setFuelCost] = useState('');
-  
+
   // Expense fields
   const [expenseType, setExpenseType] = useState('Tolls');
   const [amount, setAmount] = useState('');
-  
+
   const [error, setError] = useState('');
 
   // Submit fuel
@@ -40,7 +40,7 @@ const FuelExpenseView = ({ searchQuery }) => {
 
     try {
       await logDirectFuel(vehicleId, date, liters, fuelCost);
-      
+
       // Clear on success
       setVehicleId('');
       setLiters('');
@@ -62,7 +62,7 @@ const FuelExpenseView = ({ searchQuery }) => {
 
     try {
       await logDirectExpense(vehicleId, date, expenseType, amount);
-      
+
       // Clear on success
       setVehicleId('');
       setAmount('');
@@ -74,7 +74,7 @@ const FuelExpenseView = ({ searchQuery }) => {
   // Calculate Operational Cost (Fuel + Maintenance) per Vehicle
   const computeOperationalCosts = () => {
     const costMap = {};
-    
+
     // Initialize all vehicles
     vehicles.forEach(v => {
       costMap[v.id] = {
@@ -137,11 +137,11 @@ const FuelExpenseView = ({ searchQuery }) => {
           {/* Form Switch Card */}
           <div className="card card-handdrawn">
             <div style={{ display: 'flex', gap: '8px', padding: '2px', backgroundColor: 'rgba(255,255,255,0.03)', border: '1.5px solid var(--border-color)', borderRadius: '8px', marginBottom: '16px' }}>
-              <button 
+              <button
                 onClick={() => { setActiveForm('fuel'); setError(''); }}
                 className="btn"
-                style={{ 
-                  flex: 1, 
+                style={{
+                  flex: 1,
                   backgroundColor: activeForm === 'fuel' ? 'var(--accent-color)' : 'transparent',
                   color: activeForm === 'fuel' ? 'var(--accent-text)' : 'var(--text-secondary)',
                   boxShadow: 'none',
@@ -152,11 +152,11 @@ const FuelExpenseView = ({ searchQuery }) => {
                 <Fuel size={14} />
                 <span>Log Fuel</span>
               </button>
-              <button 
+              <button
                 onClick={() => { setActiveForm('expense'); setError(''); }}
                 className="btn"
-                style={{ 
-                  flex: 1, 
+                style={{
+                  flex: 1,
                   backgroundColor: activeForm === 'expense' ? 'var(--accent-color)' : 'transparent',
                   color: activeForm === 'expense' ? 'var(--accent-text)' : 'var(--text-secondary)',
                   boxShadow: 'none',
@@ -180,7 +180,7 @@ const FuelExpenseView = ({ searchQuery }) => {
               <form onSubmit={handleFuelSubmit}>
                 <div className="form-group">
                   <label className="form-label">Select Vehicle</label>
-                  <select 
+                  <select
                     className="form-select"
                     value={vehicleId}
                     onChange={(e) => setVehicleId(e.target.value)}
@@ -195,10 +195,10 @@ const FuelExpenseView = ({ searchQuery }) => {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <div className="form-group">
                     <label className="form-label">Fuel Volume (Liters)</label>
-                    <input 
-                      type="number" 
+                    <input
+                      type="number"
                       step="0.1"
-                      className="form-input" 
+                      className="form-input"
                       placeholder="e.g. 40"
                       value={liters}
                       onChange={(e) => setLiters(e.target.value)}
@@ -207,9 +207,9 @@ const FuelExpenseView = ({ searchQuery }) => {
 
                   <div className="form-group">
                     <label className="form-label">Fuel Cost ({currency})</label>
-                    <input 
-                      type="number" 
-                      className="form-input" 
+                    <input
+                      type="number"
+                      className="form-input"
                       placeholder="e.g. 4000"
                       value={fuelCost}
                       onChange={(e) => setFuelCost(e.target.value)}
@@ -219,9 +219,9 @@ const FuelExpenseView = ({ searchQuery }) => {
 
                 <div className="form-group">
                   <label className="form-label">Date</label>
-                  <input 
-                    type="date" 
-                    className="form-input" 
+                  <input
+                    type="date"
+                    className="form-input"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
                   />
@@ -236,7 +236,7 @@ const FuelExpenseView = ({ searchQuery }) => {
               <form onSubmit={handleExpenseSubmit}>
                 <div className="form-group">
                   <label className="form-label">Select Vehicle</label>
-                  <select 
+                  <select
                     className="form-select"
                     value={vehicleId}
                     onChange={(e) => setVehicleId(e.target.value)}
@@ -251,12 +251,13 @@ const FuelExpenseView = ({ searchQuery }) => {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <div className="form-group">
                     <label className="form-label">Expense Category</label>
-                    <select 
+                    <select
                       className="form-select"
                       value={expenseType}
                       onChange={(e) => setExpenseType(e.target.value)}
                     >
                       <option value="Tolls">Tolls</option>
+                      <option value="Maintenance">Maintenance</option>
                       <option value="Fines">Fines</option>
                       <option value="Insurance">Insurance</option>
                       <option value="Misc">Miscellaneous</option>
@@ -265,9 +266,9 @@ const FuelExpenseView = ({ searchQuery }) => {
 
                   <div className="form-group">
                     <label className="form-label">Amount ({currency})</label>
-                    <input 
-                      type="number" 
-                      className="form-input" 
+                    <input
+                      type="number"
+                      className="form-input"
                       placeholder="e.g. 150"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
@@ -277,9 +278,9 @@ const FuelExpenseView = ({ searchQuery }) => {
 
                 <div className="form-group">
                   <label className="form-label">Date</label>
-                  <input 
-                    type="date" 
-                    className="form-input" 
+                  <input
+                    type="date"
+                    className="form-input"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
                   />
@@ -328,7 +329,7 @@ const FuelExpenseView = ({ searchQuery }) => {
           <div className="table-toolbar">
             <h3 className="card-title" style={{ margin: 0 }}>Transaction Ledger</h3>
           </div>
-          
+
           <table className="data-table">
             <thead>
               <tr>
@@ -351,28 +352,12 @@ const FuelExpenseView = ({ searchQuery }) => {
                     <td className="td-mono" style={{ fontWeight: 'bold' }}>{exp.vehicleId}</td>
                     <td className="td-mono">{exp.date}</td>
                     <td>
-                      <select
-                        className={`status-select-pill badge ${
-                          exp.type === 'Fuel' ? 'badge-on-trip' :
+                      <span className={`badge ${exp.type === 'Fuel' ? 'badge-on-trip' :
                           exp.type === 'Maintenance' ? 'badge-in-shop' :
-                          'badge-retired'
-                        }`}
-                        value={exp.type}
-                        onChange={async (e) => {
-                          try {
-                            await updateExpenseType(exp.id, e.target.value);
-                          } catch (err) {
-                            alert(err.message || 'Failed to update expense category');
-                          }
-                        }}
-                      >
-                        <option value="Fuel">Fuel</option>
-                        <option value="Maintenance">Maintenance</option>
-                        <option value="Tolls">Tolls</option>
-                        <option value="Fines">Fines</option>
-                        <option value="Insurance">Insurance</option>
-                        <option value="Misc">Misc</option>
-                      </select>
+                            'badge-retired'
+                        }`}>
+                        {exp.type}
+                      </span>
                     </td>
                     <td className="td-mono" style={{ fontWeight: 'bold' }}>{formatCurrency(exp.amount)}</td>
                   </tr>
